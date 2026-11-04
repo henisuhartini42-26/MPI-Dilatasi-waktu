@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MPI Fisika XII – Relativitas: Dilatasi Waktu</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+:root{--cy:#22d3ee;--vi:#8b5cf6;--am:#fbbf24;--pk:#f472b6;--gr:#34d399;--rd:#fb7185}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{font-family:"Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;color:#e8eefc;background:radial-gradient(ellipse at 18% 8%,#241a6b 0%,#0b1038 42%,#02040f 100%);overflow:hidden}
+#bg{position:fixed;inset:0;width:100%;height:100%;z-index:0;display:block}
+.screen{position:fixed;inset:0;z-index:1;overflow-y:auto;overflow-x:hidden;padding:74px 14px 40px;display:none;-webkit-overflow-scrolling:touch}
+.screen.active{display:block;animation:screenIn .5s ease both}
+.screen.center.active{display:flex;align-items:center;justify-content:center}
+@keyframes screenIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes dropIn{0%{opacity:0;transform:translateY(-80px) rotate(-12deg) scale(.4)}100%{opacity:1;transform:none}}
+@keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+@keyframes pulse{0%,100%{box-shadow:0 5px 0 #b45309,0 0 0 0 rgba(251,191,36,.7)}50%{box-shadow:0 5px 0 #b45309,0 0 0 18px rgba(251,191,36,0)}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.wrap{max-width:980px;margin:0 auto}
+.glass{background:rgba(10,16,52,.66);border:1px solid rgba(140,170,255,.28);border-radius:22px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);box-shadow:0 10px 40px rgba(0,0,0,.35)}
+.pad{padding:20px}
+h1,h2,h3,p{margin:0}
+.h2{font-size:clamp(1.35rem,4.5vw,2.1rem);font-weight:800;line-height:1.2}
+.h3{font-size:1.15rem;font-weight:800;color:#a5f3fc}
+.grad{background:linear-gradient(90deg,#22d3ee,#a78bfa,#f472b6);-webkit-background-clip:text;background-clip:text;color:transparent}
+.p{line-height:1.7;color:#dbe5ff}
+.mt{margin-top:12px}.mt2{margin-top:20px}
+.muted{color:#9fb2e8;font-size:.9rem}
+.center-t{text-align:center}
+.dev{font-size:.82rem;color:#9fb2e8;text-align:center;margin-top:22px}
+.dev b{color:#fde68a}
+/* tombol */
+button{font-family:inherit;cursor:pointer}
+button:disabled{cursor:not-allowed;opacity:.55}
+button:not(:disabled):hover{transform:translateY(-3px) scale(1.04);filter:brightness(1.18)}
+button:not(:disabled):active{transform:translateY(1px) scale(.98)}
+.btn{border:0;color:#fff;font-weight:800;font-size:1rem;padding:.75rem 1.3rem;border-radius:14px;background:linear-gradient(135deg,#6366f1,#8b5cf6);box-shadow:0 5px 0 #3730a3,0 10px 22px rgba(0,0,0,.35);transition:transform .15s,filter .15s}
+.btn.cy{background:linear-gradient(135deg,#06b6d4,#3b82f6);box-shadow:0 5px 0 #1d4ed8,0 10px 22px rgba(0,0,0,.35)}
+.btn.am{background:linear-gradient(135deg,#fbbf24,#f97316);color:#3b1d00;box-shadow:0 5px 0 #b45309,0 10px 22px rgba(0,0,0,.35)}
+.btn.gr{background:linear-gradient(135deg,#34d399,#10b981);box-shadow:0 5px 0 #047857,0 10px 22px rgba(0,0,0,.35)}
+.btn.pk{background:linear-gradient(135deg,#f472b6,#ec4899);box-shadow:0 5px 0 #9d174d,0 10px 22px rgba(0,0,0,.35)}
+.btn.gh{background:rgba(255,255,255,.1);box-shadow:none;border:1px solid rgba(255,255,255,.28)}
+.btn.big{font-size:1.5rem;padding:1rem 2.6rem;border-radius:18px;letter-spacing:.08em}
+.btn.pulse{animation:pulse 1.8s infinite}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.row.c{justify-content:center}
+.fbtn{position:fixed;top:12px;z-index:70;border:0;color:#fff;font-weight:800;border-radius:14px;padding:.6rem 1rem;font-size:.95rem;background:linear-gradient(135deg,#f43f5e,#f97316);box-shadow:0 4px 0 #9f1239,0 8px 18px rgba(0,0,0,.4);display:none;align-items:center;gap:6px;transition:transform .15s,filter .15s}
+#homeBtn{left:12px}
+#gearBtn{right:12px;background:linear-gradient(135deg,#06b6d4,#6366f1);box-shadow:0 4px 0 #3730a3,0 8px 18px rgba(0,0,0,.4);font-size:1.1rem}
+#settings{position:fixed;top:64px;right:12px;z-index:75;width:min(310px,calc(100vw - 24px));padding:18px;display:none}
+#settings.open{display:block;animation:fadeUp .3s both}
+#settings label{font-weight:700;display:block;margin:12px 0 6px}
+#settings input[type=range]{width:100%;accent-color:#22d3ee}
+/* splash */
+.ttl{font-size:clamp(2rem,9.6vw,6.4rem);font-weight:900;letter-spacing:.04em;line-height:1;background:linear-gradient(180deg,#fff,#7dd3fc 60%,#a78bfa);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 6px 24px rgba(99,102,241,.7))}
+.ttl span{display:inline-block;animation:dropIn .9s cubic-bezier(.2,1.4,.4,1) both;animation-delay:calc(var(--i)*.07s)}
+.sub{font-size:clamp(1.3rem,5vw,2.6rem);font-weight:900;letter-spacing:.18em;margin-top:8px;animation:fadeUp 1s .9s both}
+.tag{animation:fadeUp 1s .5s both;font-weight:700;letter-spacing:.12em;color:#a5f3fc;font-size:clamp(.75rem,2.6vw,1rem)}
+.scene{display:flex;justify-content:center;align-items:center;gap:clamp(8px,4vw,40px);margin:18px 0;animation:fadeUp 1s 1.1s both}
+.scene svg{width:clamp(70px,20vw,130px);height:auto;animation:floaty 4s ease-in-out infinite}
+.scene svg:nth-child(2){animation-delay:-1.3s}.scene svg:nth-child(3){animation-delay:-2.6s;width:clamp(110px,28vw,200px)}
+.nameBox{animation:fadeUp 1s 1.3s both;max-width:420px;margin:0 auto}
+.inp{width:100%;font-family:inherit;font-size:1.1rem;padding:.8rem 1rem;border-radius:14px;border:2px solid rgba(165,243,252,.5);background:rgba(2,6,30,.75);color:#fff;outline:none}
+.inp:focus{border-color:#fde047;box-shadow:0 0 0 4px rgba(253,224,71,.25)}
+.inp::placeholder{color:#7f93c9}
+.go{animation:fadeUp 1s 1.5s both;margin-top:18px}
+/* menu */
+.menu{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:18px}
+@media(max-width:600px){.menu{grid-template-columns:1fr}}
+.mbtn{border:0;border-radius:22px;padding:22px 18px;color:#fff;text-align:left;display:flex;gap:16px;align-items:center;font-weight:900;font-size:1.5rem;letter-spacing:.06em;transition:transform .15s,filter .15s}
+.mbtn small{display:block;font-size:.82rem;font-weight:600;letter-spacing:0;opacity:.92;margin-top:3px}
+.mbtn .ic{font-size:2.6rem;flex:none;width:68px;height:68px;border-radius:18px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.2)}
+.m1{background:linear-gradient(135deg,#06b6d4,#3b82f6);box-shadow:0 7px 0 #1d4ed8,0 14px 26px rgba(0,0,0,.4)}
+.m2{background:linear-gradient(135deg,#a855f7,#6366f1);box-shadow:0 7px 0 #4338ca,0 14px 26px rgba(0,0,0,.4)}
+.m3{background:linear-gradient(135deg,#f59e0b,#f97316);box-shadow:0 7px 0 #b45309,0 14px 26px rgba(0,0,0,.4)}
+.m4{background:linear-gradient(135deg,#ec4899,#f43f5e);box-shadow:0 7px 0 #9d174d,0 14px 26px rgba(0,0,0,.4)}
+.ill{width:100%;height:auto;max-height:110px;display:block}
+/* materi */
+.tabs{display:flex;gap:8px;overflow-x:auto;padding-bottom:8px;margin-bottom:12px}
+.tab{flex:none;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);color:#cfe0ff;padding:.55rem .95rem;border-radius:999px;font-weight:700;font-size:.85rem;white-space:nowrap}
+.tab.on{background:linear-gradient(135deg,#06b6d4,#8b5cf6);color:#fff;border-color:transparent}
+.rv{margin-top:10px}
+.rv-btn{width:100%;text-align:left;border:1px solid rgba(34,211,238,.5);background:rgba(34,211,238,.12);color:#d9f7ff;border-radius:14px;padding:.8rem 1rem;font-weight:700;display:flex;justify-content:space-between;gap:10px;font-size:1rem}
+.rv-btn::after{content:"＋";flex:none}
+.rv-btn.open{background:rgba(34,211,238,.25)}
+.rv-btn.open::after{content:"－"}
+.rv-body{display:none;padding:.9rem 1rem;margin-top:6px;background:rgba(255,255,255,.07);border-radius:12px;line-height:1.7;color:#e3ecff}
+.rv-body.open{display:block;animation:fadeUp .35s both}
+.formula{margin:14px auto;padding:14px 16px;text-align:center;font-size:clamp(1.1rem,3.6vw,1.6rem);font-weight:800;border-radius:16px;background:linear-gradient(135deg,rgba(251,191,36,.18),rgba(244,114,182,.18));border:2px dashed rgba(253,224,71,.6);color:#fff}
+.frac{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;margin:0 6px}
+.frac i{font-style:normal;padding:0 8px}
+.frac i:first-child{border-bottom:2px solid currentColor}
+.step{display:none;margin-top:10px;padding:.8rem 1rem;border-left:5px solid #fbbf24;background:rgba(255,255,255,.07);border-radius:10px;line-height:1.7}
+.step.show{display:block;animation:fadeUp .4s both}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+@media(max-width:640px){.two{grid-template-columns:1fr}}
+.panel{background:rgba(2,6,30,.5);border:1px solid rgba(255,255,255,.15);border-radius:16px;padding:10px}
+.panel .cap{font-size:.9rem;color:#a5f3fc;text-align:center;margin-bottom:4px}
+.svgbox{width:100%;height:auto;display:block}
+.tick{text-align:center;font-weight:700;color:#fde68a}
+.pager{display:flex;justify-content:space-between;gap:10px;margin-top:18px;align-items:center}
+.tbl{width:100%;border-collapse:collapse;margin-top:10px;font-size:.95rem}
+.tbl th,.tbl td{padding:.5rem .6rem;border-bottom:1px solid rgba(255,255,255,.15);text-align:center}
+.tbl th{color:#fde68a}
+.box{padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15)}
+.chipv{display:inline-block;padding:.15rem .6rem;border-radius:999px;background:rgba(253,224,71,.2);color:#fde68a;font-weight:800}
+input[type=range].sl{width:100%;accent-color:#fbbf24;height:30px}
+.big-n{font-size:clamp(1.6rem,6vw,2.4rem);font-weight:900;color:#fde68a}
+.list{margin:8px 0 0;padding-left:1.2rem;line-height:1.8;color:#dbe5ff}
+/* kuis & simulasi */
+.grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:14px}
+@media(max-width:600px){.grid2{grid-template-columns:1fr}}
+.gcard{border:0;border-radius:20px;padding:18px;text-align:left;color:#fff;display:flex;gap:14px;align-items:center;transition:transform .15s,filter .15s}
+.gcard .ic{font-size:2.3rem;width:62px;height:62px;border-radius:16px;background:rgba(255,255,255,.22);display:flex;align-items:center;justify-content:center;flex:none}
+.gcard b{font-size:1.2rem;display:block}
+.gcard span{font-size:.85rem;opacity:.92}
+.g-cyan{background:linear-gradient(135deg,#06b6d4,#3b82f6);box-shadow:0 6px 0 #1d4ed8}
+.g-amber{background:linear-gradient(135deg,#f59e0b,#ea580c);box-shadow:0 6px 0 #9a3412}
+.g-pink{background:linear-gradient(135deg,#ec4899,#a855f7);box-shadow:0 6px 0 #6b21a8}
+.g-green{background:linear-gradient(135deg,#10b981,#0ea5e9);box-shadow:0 6px 0 #0f766e}
+.lvgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px;margin-top:14px}
+.lv{border:0;border-radius:18px;padding:16px 10px;color:#fff;font-weight:900;font-size:1.1rem;background:linear-gradient(135deg,#6366f1,#8b5cf6);box-shadow:0 5px 0 #3730a3;transition:transform .15s,filter .15s}
+.lv small{display:block;font-weight:600;margin-top:4px;font-size:.85rem}
+.lv:disabled{background:#334155;box-shadow:0 5px 0 #1e293b}
+.bar{height:10px;border-radius:999px;background:rgba(255,255,255,.15);overflow:hidden;margin:10px 0 14px}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,#22d3ee,#a78bfa,#f472b6);border-radius:999px;transition:width .4s}
+.badge{display:inline-block;padding:.25rem .8rem;border-radius:999px;font-weight:800;font-size:.85rem;background:rgba(34,211,238,.2);color:#a5f3fc;border:1px solid rgba(34,211,238,.5)}
+.badge.y{background:rgba(251,191,36,.2);color:#fde68a;border-color:rgba(251,191,36,.5)}
+.qtext{font-size:clamp(1.05rem,3.4vw,1.35rem);font-weight:700;line-height:1.55;margin:6px 0 14px}
+.opts{display:grid;gap:10px}
+.opt{width:100%;text-align:left;border:2px solid rgba(165,190,255,.4);background:rgba(255,255,255,.08);color:#fff;border-radius:14px;padding:.8rem 1rem;font-size:1rem;font-weight:600;transition:transform .15s,filter .15s}
+.opt.sel{border-color:#fde047;background:rgba(253,224,71,.2)}
+.opt.ok{border-color:#34d399;background:rgba(52,211,153,.3)}
+.opt.bad{border-color:#fb7185;background:rgba(251,113,133,.3)}
+.fb{margin-top:14px;padding:12px 14px;border-radius:14px;line-height:1.65;animation:fadeUp .35s both}
+.fb.ok{background:rgba(52,211,153,.2);border:1px solid #34d399}
+.fb.bad{background:rgba(251,113,133,.2);border:1px solid #fb7185}
+.blank{display:inline-block;min-width:110px;min-height:2.2em;vertical-align:middle;margin:0 4px;padding:.2rem .7rem;border:2px dashed #fde047;border-radius:12px;background:rgba(253,224,71,.1);color:#fff;font-weight:800;font-size:1rem}
+.blank.filled{border-style:solid;background:rgba(99,102,241,.45)}
+.blank.ok{border-color:#34d399;background:rgba(52,211,153,.35)}
+.blank.bad{border-color:#fb7185;background:rgba(251,113,133,.35)}
+.bank{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px;padding:12px;border-radius:14px;background:rgba(255,255,255,.06);min-height:56px}
+.chip{border:0;border-radius:12px;padding:.55rem 1rem;font-weight:800;color:#3b1d00;background:linear-gradient(135deg,#fde68a,#fbbf24);box-shadow:0 4px 0 #b45309;font-size:1rem;transition:transform .15s,filter .15s}
+.chip.sel{outline:3px solid #fff}
+.chip.used{visibility:hidden}
+.mtxt{line-height:2.4;font-size:1.15rem}
+.tok{border:2px solid transparent;background:transparent;color:#fff;font-size:1.1rem;padding:.1rem .35rem;border-radius:8px;margin:2px 1px;transition:transform .15s,filter .15s}
+.tok.m{background:rgba(253,224,71,.35);border-color:#fde047}
+.tok.ok{background:rgba(52,211,153,.4);border-color:#34d399}
+.tok.bad{background:rgba(251,113,133,.4);border-color:#fb7185}
+.tok.miss{border-color:#fbbf24;border-style:dashed}
+.memgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:10px;margin-top:12px}
+.fc{border:0;border-radius:14px;min-height:84px;padding:6px;color:#fff;font-weight:800;font-size:.8rem;line-height:1.2;background:linear-gradient(135deg,#6366f1,#8b5cf6);box-shadow:0 4px 0 #3730a3;transition:transform .15s,filter .15s}
+.fc .q{font-size:1.7rem}
+.fc.up{background:linear-gradient(135deg,#fde68a,#fbbf24);color:#3b1d00;box-shadow:0 4px 0 #b45309}
+.fc.done{background:linear-gradient(135deg,#34d399,#10b981);color:#fff;box-shadow:0 4px 0 #047857}
+.slots{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:12px 0}
+.slot{width:44px;height:52px;border-radius:12px;border:2px dashed #fde047;background:rgba(253,224,71,.1);display:flex;align-items:center;justify-content:center;font-size:1.5rem;font-weight:900}
+.slot.f{border-style:solid;background:rgba(99,102,241,.5)}
+.slots.ok .slot{background:rgba(52,211,153,.5);border-color:#34d399}
+.slots.bad{animation:shake .4s}
+.tile{width:48px;height:54px;border:0;border-radius:12px;font-size:1.4rem;font-weight:900;color:#3b1d00;background:linear-gradient(135deg,#fde68a,#fbbf24);box-shadow:0 4px 0 #b45309;transition:transform .15s,filter .15s}
+.tile:disabled{visibility:hidden}
+.stars{font-size:2rem;letter-spacing:4px}
+.certwrap{margin-top:14px}
+.certwrap canvas{width:100%;height:auto;border-radius:14px;box-shadow:0 10px 40px rgba(0,0,0,.5);display:block}
+.score{font-size:clamp(3rem,14vw,5.5rem);font-weight:900;line-height:1}
+.dots{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin:10px 0}
+.dots i{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-style:normal;font-size:.8rem;font-weight:800}
+.dots i.ok{background:#10b981}.dots i.bad{background:#f43f5e}
+#toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(30px);z-index:99;background:#111a4a;border:1px solid #a5f3fc;color:#fff;padding:.7rem 1.2rem;border-radius:999px;font-weight:700;opacity:0;pointer-events:none;transition:.3s;max-width:92vw;text-align:center}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+@media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;animation-iteration-count:1!important}}
+</style>
+</head>
+<body>
+
+<!-- Sprite gambar relativitas -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+ <defs>
+  <radialGradient id="gEarth" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#7dd3fc"/><stop offset=".55" stop-color="#2563eb"/><stop offset="1" stop-color="#0b1b5e"/></radialGradient>
+  <linearGradient id="gRocket" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f8fafc"/><stop offset="1" stop-color="#94a3b8"/></linearGradient>
+  <linearGradient id="gFlame" x1="1" y1="0" x2="0" y2="0"><stop offset="0" stop-color="#fde047"/><stop offset="1" stop-color="#f97316" stop-opacity=".2"/></linearGradient>
+  <symbol id="i-earth" viewBox="0 0 100 100">
+   <circle cx="50" cy="50" r="46" fill="url(#gEarth)"/>
+   <path d="M25 35 Q35 22 48 30 Q50 42 38 50 Q26 48 25 35Z" fill="#4ade80" opacity=".9"/>
+   <path d="M58 55 Q72 48 80 60 Q76 76 62 74 Q54 66 58 55Z" fill="#4ade80" opacity=".9"/>
+   <circle cx="50" cy="50" r="46" fill="none" stroke="#bae6fd" stroke-width="2" opacity=".5"/>
+  </symbol>
+  <symbol id="i-rocket" viewBox="0 0 120 60">
+   <path d="M20 30 L0 18 Q10 30 0 42Z" fill="url(#gFlame)"/>
+   <path d="M30 20 L14 6 L34 27Z" fill="#f43f5e"/><path d="M30 40 L14 54 L34 33Z" fill="#f43f5e"/>
+   <path d="M20 30 Q60 4 108 30 Q60 56 20 30Z" fill="url(#gRocket)"/>
+   <circle cx="78" cy="30" r="9" fill="#22d3ee" stroke="#1e3a8a" stroke-width="3"/>
+  </symbol>
+  <symbol id="i-clock" viewBox="0 0 100 100">
+   <circle cx="50" cy="50" r="46" fill="#0f172a" stroke="#22d3ee" stroke-width="5"/>
+   <circle cx="50" cy="50" r="38" fill="none" stroke="#a5f3fc" stroke-width="4" stroke-dasharray="2 17.9"/>
+   <line x1="50" y1="50" x2="50" y2="22" stroke="#fbbf24" stroke-width="5" stroke-linecap="round"/>
+   <line x1="50" y1="50" x2="68" y2="60" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+   <circle cx="50" cy="50" r="4" fill="#f472b6"/>
+  </symbol>
+ </defs>
+</svg>
+
+<canvas id="bg"></canvas>
+<button id="homeBtn" class="fbtn" aria-label="Kembali ke menu utama">🏠 HOME</button>
+<button id="gearBtn" class="fbtn" aria-label="Pengaturan">⚙️</button>
+
+<div id="settings" class="glass">
+ <h3 class="h3">⚙️ Pengaturan</h3>
+ <label>Musik latar</label>
+ <button id="musicBtn" class="btn cy" style="width:100%">🎵 Musik: ON</button>
+ <label>Volume: <span id="volLbl">60%</span></label>
+ <input id="volSl" type="range" min="0" max="100" value="60">
+ <p class="muted mt">Volume berlaku untuk musik dan efek suara.</p>
+</div>
+<div id="toast"></div>
+
+<main>
+<!-- ============ SPLASH ============ -->
+<section id="s-splash" class="screen center active">
+ <div class="wrap center-t">
+  <div class="tag">MEDIA PEMBELAJARAN INTERAKTIF · FISIKA KELAS XII SMA</div>
+  <h1 class="ttl mt" id="ttl" aria-label="Relativitas"></h1>
+  <div class="sub grad">DILATASI WAKTU</div>
+  <div class="scene">
+   <svg viewBox="0 0 100 100"><use href="#i-earth" width="100" height="100"/></svg>
+   <svg viewBox="0 0 100 100"><use href="#i-clock" width="100" height="100"/></svg>
+   <svg viewBox="0 0 120 60"><use href="#i-rocket" width="120" height="60"/></svg>
+  </div>
+  <div class="nameBox">
+   <input id="nameSplash" class="inp" type="text" maxlength="40" autocomplete="off" autocapitalize="words" spellcheck="false" placeholder="✏️ Ketik namamu di sini">
+   <input id="kelasSplash" class="inp" style="margin-top:10px" type="text" maxlength="20" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="🏫 Ketik kelasmu (mis. XII IPA 1)">
+   <p class="muted mt">Nama dan kelas akan tampil pada sertifikat pencapaian.</p>
+  </div>
+  <div class="go"><button id="startBtn" class="btn am big pulse">▶ MULAI</button></div>
+  <p class="dev">Pengembang: <b>Heni Suhartini, S.T.P., S.Pd, M.Pd.</b> · November 2026</p>
+ </div>
+</section>
+
+<!-- ============ MENU ============ -->
+<section id="s-menu" class="screen">
+ <div class="wrap">
+  <div class="glass pad center-t">
+   <svg class="ill" viewBox="0 0 360 90"><use href="#i-earth" x="10" y="0" width="90" height="90"/><use href="#i-clock" x="135" y="0" width="90" height="90"/><use href="#i-rocket" x="245" y="15" width="110" height="55"/></svg>
+   <h2 class="h2 grad mt">MENU UTAMA</h2>
+   <p class="p" id="greet"></p>
+  </div>
+  <div class="menu">
+   <button class="mbtn m1" data-go="beranda"><span class="ic">🏠</span><span>BERANDA<small>Tujuan &amp; petunjuk belajar</small></span></button>
+   <button class="mbtn m2" data-go="materi"><span class="ic">📚</span><span>MATERI<small>Pelajari dilatasi waktu secara interaktif</small></span></button>
+   <button class="mbtn m3" data-go="simulasi"><span class="ic">🧪</span><span>SIMULASI<small>10 soal uji pemahaman + sertifikat</small></span></button>
+   <button class="mbtn m4" data-go="kuis"><span class="ic">🎮</span><span>KUIS<small>4 game seru, level bertingkat</small></span></button>
+  </div>
+  <p class="dev">Pengembang: <b>Heni Suhartini, S.T.P., S.Pd, M.Pd.</b> · November 2026</p>
+ </div>
+</section>
+
+<!-- ============ BERANDA ============ -->
+<section id="s-beranda" class="screen">
+ <div class="wrap">
+  <div class="glass pad">
+   <h2 class="h2 grad">🌌 Selamat Datang di Dunia Relativitas</h2>
+   <p class="p mt" id="berandaHi"></p>
+   <svg class="ill mt" viewBox="0 0 360 90"><use href="#i-earth" x="10" y="0" width="90" height="90"/><use href="#i-clock" x="135" y="0" width="90" height="90"/><use href="#i-rocket" x="245" y="15" width="110" height="55"/></svg>
+  </div>
+  <div class="glass pad mt2">
+   <h3 class="h3">🎯 Tujuan Pembelajaran</h3>
+   <ol class="list">
+    <li>Siswa dapat <b>memahami konsep</b> Relativitas Dilatasi Waktu.</li>
+    <li>Siswa dapat <b>menerapkan konsep</b> Relativitas Dilatasi Waktu dalam kehidupan sehari-hari.</li>
+   </ol>
+  </div>
+  <div class="glass pad mt2">
+   <h3 class="h3">🗺️ Peta Belajar</h3>
+   <div class="grid2">
+    <div class="box"><b>1. MATERI 📚</b><br><span class="muted">Baca 6 halaman interaktif: klik, buka langkah, dan coba simulator kecepatan.</span></div>
+    <div class="box"><b>2. KUIS 🎮</b><br><span class="muted">Mainkan 4 game: Kuis Galaksi, Kartu Memori, Hitung Gamma, Susun Kata.</span></div>
+    <div class="box"><b>3. SIMULASI 🧪</b><br><span class="muted">Kerjakan 10 soal uji pemahaman. Nilai tersimpan dan kamu mendapat sertifikat.</span></div>
+    <div class="box"><b>4. PENGATURAN ⚙️</b><br><span class="muted">Atur musik dan volume di pojok kanan atas. Tombol HOME di kiri atas.</span></div>
+   </div>
+  </div>
+  <div class="glass pad mt2 center-t">
+   <h3 class="h3">💡 Tahukah Kamu?</h3>
+   <p class="p mt" id="factTxt">Klik tombol di bawah untuk melihat fakta menarik tentang dilatasi waktu.</p>
+   <div class="mt"><button id="factBtn" class="btn cy">✨ Fakta Berikutnya</button></div>
+  </div>
+  <div class="row c mt2"><button class="btn am" data-go="materi">📚 Mulai Belajar Materi</button><button class="btn gh" data-go="menu">☰ Menu Utama</button></div>
+  <p class="dev">Pengembang: <b>Heni Suhartini, S.T.P., S.Pd, M.Pd.</b> · November 2026</p>
+ </div>
+</section>
+
+<!-- ============ MATERI ============ -->
+<section id="s-materi" class="screen">
+ <div class="wrap">
+  <h2 class="h2 grad" style="margin-bottom:10px">📚 Materi: Relativitas Dilatasi Waktu</h2>
+  <div class="tabs" id="mTabs"></div>
+  <div class="glass pad" id="mBody"></div>
+  <div class="pager"><button class="btn gh" id="mPrev">◀ Sebelumnya</button><span class="muted" id="mPage"></span><button class="btn cy" id="mNext">Berikutnya ▶</button></div>
+ </div>
+</section>
+
+<!-- ============ SIMULASI ============ -->
+<section id="s-simulasi" class="screen">
+ <div class="wrap" id="simBody"></div>
+</section>
+
+<!-- ============ KUIS ============ -->
+<section id="s-kuis" class="screen">
+ <div class="wrap" id="kuisBody"></div>
+</section>
+</main>
+
+<script>
+/* =====================================================================
+   KONFIGURASI REKAP NILAI KE SHEET
+   ---------------------------------------------------------------------
+   Halaman web tidak bisa menulis langsung ke lembar kerja tanpa sebuah
+   "penerima". Cara paling mudah (gratis) memakai Google Apps Script:
+   1. Buat Spreadsheet. Baris 1: Waktu | Nama | Kelas | Nilai | Benar | Durasi(detik)
+   2. Menu Extensions > Apps Script, tempel kode ini lalu simpan:
+        function doPost(e){
+          var d = JSON.parse(e.postData.contents);
+          SpreadsheetApp.getActiveSheet().appendRow([new Date(), d.nama, d.kelas, d.nilai, d.benar, d.durasi]);
+          return ContentService.createTextOutput('OK');
+        }
+   3. Deploy > New deployment > Web app > Execute as: Me,
+      Who has access: Anyone > salin URL Web app.
+   4. Tempel URL itu pada SHEET_URL di bawah ini.
+   Selama SHEET_URL kosong, nilai tetap tersimpan di perangkat dan dapat
+   diunduh sebagai CSV dari halaman hasil simulasi.
+   ===================================================================== */
+const SHEET_URL = "";
+
+'use strict';
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const fmt=(n,d=2)=>Number(n).toFixed(d).replace('.',',');
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const gam=b=>1/Math.sqrt(1-b*b);
+const DEV='Heni Suhartini, S.T.P., S.Pd, M.Pd.';
+
+/* ---------- State & penyimpanan ---------- */
+const S={name:'',kelas:'',music:true,vol:.6,prog:{}};
+try{
+  const st=JSON.parse(localStorage.getItem('mpi_set')||'{}');
+  if(typeof st.music==='boolean')S.music=st.music;
+  if(typeof st.vol==='number')S.vol=st.vol;
+  S.prog=JSON.parse(localStorage.getItem('mpi_prog')||'{}');
+  S.name=localStorage.getItem('mpi_name')||'';
+  S.kelas=localStorage.getItem('mpi_kelas')||'';
+}catch(e){}
+const save=()=>{try{localStorage.setItem('mpi_set',JSON.stringify({music:S.music,vol:S.vol}));localStorage.setItem('mpi_prog',JSON.stringify(S.prog));localStorage.setItem('mpi_name',S.name);localStorage.setItem('mpi_kelas',S.kelas)}catch(e){}};
+
+let toastT;
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2300)}
+
+/* ---------- Audio (dibuat dengan WebAudio, tanpa file eksternal) ---------- */
+const Aud=(()=>{
+  let ctx,master,musicGain,sfxGain,timer=null,step=0,nextTime=0,playing=false,noiseBuf;
+  const bpm=124,eighth=60/bpm/2;
+  const midi=m=>440*Math.pow(2,(m-69)/12);
+  const LEAD=[72,76,79,76,72,76,79,0, 69,72,76,72,69,72,76,0, 77,72,69,72,77,72,69,0, 74,71,67,71,74,79,74,0];
+  const BASS=[48,45,41,43];
+  const CH=[[60,64,67],[57,60,64],[53,57,60],[55,59,62]];
+  function init(){
+    if(ctx)return;
+    const AC=window.AudioContext||window.webkitAudioContext; if(!AC)return;
+    ctx=new AC(); master=ctx.createGain(); master.gain.value=S.vol; master.connect(ctx.destination);
+    musicGain=ctx.createGain(); musicGain.gain.value=.34; musicGain.connect(master);
+    sfxGain=ctx.createGain(); sfxGain.gain.value=.8; sfxGain.connect(master);
+    noiseBuf=ctx.createBuffer(1,ctx.sampleRate*.05,ctx.sampleRate);
+    const d=noiseBuf.getChannelData(0); for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;
+  }
+  function resume(){init(); if(ctx&&ctx.state==='suspended')ctx.resume()}
+  function tone(f,t,dur,type,vol,dest){
+    const o=ctx.createOscillator(),g=ctx.createGain();
+    o.type=type;o.frequency.setValueAtTime(f,t);
+    g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(vol,t+.012);g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+    o.connect(g);g.connect(dest);o.start(t);o.stop(t+dur+.03);
+  }
+  function hat(t){
+    const s=ctx.createBufferSource();s.buffer=noiseBuf;
+    const f=ctx.createBiquadFilter();f.type='highpass';f.frequency.value=7000;
+    const g=ctx.createGain();g.gain.value=.12;
+    s.connect(f);f.connect(g);g.connect(musicGain);s.start(t);
+  }
+  function schedule(){
+    while(nextTime<ctx.currentTime+.18){
+      const i=step%32,bar=Math.floor(i/8),n=LEAD[i];
+      if(n)tone(midi(n),nextTime,eighth*.92,'triangle',.24,musicGain);
+      if(i%8===0)tone(midi(BASS[bar]),nextTime,eighth*3.6,'sine',.4,musicGain);
+      if(i%4===2)CH[bar].forEach(m=>tone(midi(m+12),nextTime,eighth*1.4,'square',.035,musicGain));
+      if(i%2===1)hat(nextTime);
+      nextTime+=eighth;step++;
+    }
+  }
+  return{
+    resume,
+    startMusic(){ if(!S.music)return; resume(); if(!ctx||playing)return; playing=true; nextTime=ctx.currentTime+.06; timer=setInterval(schedule,40); },
+    stopMusic(){ playing=false; clearInterval(timer); timer=null; },
+    setVol(v){ if(master)master.gain.setTargetAtTime(v,ctx.currentTime,.02); },
+    suspend(){ if(ctx&&ctx.state==='running')ctx.suspend() },
+    wake(){ if(ctx&&ctx.state==='suspended'&&S.music)ctx.resume() },
+    sfx(n){
+      if(!ctx||ctx.state!=='running')return; const t=ctx.currentTime,d=sfxGain;
+      switch(n){
+        case 'click':tone(740,t,.08,'square',.16,d);tone(1110,t+.04,.08,'square',.1,d);break;
+        case 'good':[523,659,784,1046].forEach((f,i)=>tone(f,t+i*.08,.18,'triangle',.3,d));break;
+        case 'bad':tone(220,t,.25,'sawtooth',.18,d);tone(165,t+.13,.3,'sawtooth',.18,d);break;
+        case 'flip':tone(520,t,.07,'sine',.3,d);break;
+        case 'match':tone(660,t,.1,'triangle',.3,d);tone(990,t+.09,.18,'triangle',.3,d);break;
+        case 'win':[523,659,784,659,784,1046,1318].forEach((f,i)=>tone(f,t+i*.11,.26,'triangle',.3,d));break;
+      }
+    }
+  };
+})();
+document.addEventListener('click',e=>{
+  const b=e.target.closest('button');
+  if(b&&!b.disabled){Aud.resume();Aud.sfx('click')}
+},true);
+document.addEventListener('visibilitychange',()=>{document.hidden?Aud.suspend():Aud.wake()});
+
+/* ---------- Pengaturan ---------- */
+function syncSettings(){
+  $('#musicBtn').textContent='🎵 Musik: '+(S.music?'ON':'OFF');
+  $('#musicBtn').className='btn '+(S.music?'cy':'gh');
+  $('#volSl').value=Math.round(S.vol*100);
+  $('#volLbl').textContent=Math.round(S.vol*100)+'%';
+}
+$('#gearBtn').onclick=()=>$('#settings').classList.toggle('open');
+$('#musicBtn').onclick=()=>{S.music=!S.music;S.music?Aud.startMusic():Aud.stopMusic();syncSettings();save()};
+$('#volSl').addEventListener('input',e=>{S.vol=e.target.value/100;Aud.resume();Aud.setVol(S.vol);syncSettings();save()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')$('#settings').classList.remove('open')});
+syncSettings();
+
+/* ---------- Latar belakang relativitas (bintang + kisi ruang-waktu) ---------- */
+(function(){
+  const cv=$('#bg'),c=cv.getContext('2d');let W,H,stars=[];
+  function size(){
+    W=cv.width=innerWidth;H=cv.height=innerHeight;
+    stars=Array.from({length:Math.min(320,Math.floor(W*H/5500))},()=>({x:Math.random()*W,y:Math.random()*H*.72,r:Math.random()*1.6+.3,s:Math.random()*2+.6,p:Math.random()*6.28}));
+  }
+  addEventListener('resize',size);size();
+  function frame(t){
+    c.clearRect(0,0,W,H);
+    let g=c.createRadialGradient(W*.8,H*.2,0,W*.8,H*.2,W*.45);g.addColorStop(0,'rgba(168,85,247,.22)');g.addColorStop(1,'rgba(168,85,247,0)');c.fillStyle=g;c.fillRect(0,0,W,H);
+    g=c.createRadialGradient(W*.15,H*.55,0,W*.15,H*.55,W*.4);g.addColorStop(0,'rgba(34,211,238,.16)');g.addColorStop(1,'rgba(34,211,238,0)');c.fillStyle=g;c.fillRect(0,0,W,H);
+    for(const s of stars){
+      s.x-=s.r*.06;if(s.x<0)s.x=W;
+      c.globalAlpha=.45+.55*Math.sin(t/700*s.s+s.p);c.fillStyle='#fff';c.beginPath();c.arc(s.x,s.y,s.r,0,6.283);c.fill();
+    }
+    c.globalAlpha=1;
+    const h0=H*.58,cx=W*(.5+.26*Math.sin(t/7000)),depth=Math.min(90,H*.12),wid=W*.15;
+    const well=(x,k)=>depth*Math.exp(-Math.pow((x-cx)/wid,2))*k;
+    c.lineWidth=1;
+    for(let r=0;r<12;r++){
+      const k=((r+(t/1800)%1)/12),y=h0+(H-h0)*k*k;
+      c.strokeStyle='rgba(90,210,255,'+(.08+k*.3)+')';c.beginPath();
+      for(let x=0;x<=W;x+=18){const yy=y+well(x,k);x?c.lineTo(x,yy):c.moveTo(x,yy)}
+      c.stroke();
+    }
+    for(let j=-16;j<=16;j++){
+      c.strokeStyle='rgba(167,139,250,.26)';c.beginPath();
+      for(let s=0;s<=14;s++){
+        const k=s/14,xh=W/2+j*W*.035,xb=W/2+j*W*.17,x=xh+(xb-xh)*k,y=h0+(H-h0)*k*k+well(x,k);
+        s?c.lineTo(x,y):c.moveTo(x,y);
+      }
+      c.stroke();
+    }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+
+/* ---------- Navigasi layar ---------- */
+const cleanups=[];
+function runCleanups(){while(cleanups.length){try{cleanups.pop()()}catch(e){}}}
+function loop(fn){let id,run=true;const f=t=>{if(!run)return;fn(t);id=requestAnimationFrame(f)};id=requestAnimationFrame(f);const stop=()=>{run=false;cancelAnimationFrame(id)};cleanups.push(stop);return stop}
+let tabStops=[];
+function loopTab(fn){let id,run=true;const f=t=>{if(!run)return;fn(t);id=requestAnimationFrame(f)};id=requestAnimationFrame(f);tabStops.push(()=>{run=false;cancelAnimationFrame(id)})}
+function stopTab(){tabStops.forEach(f=>f());tabStops=[]}
+let current='splash';
+const hooks={};
+function go(id){
+  runCleanups();
+  $$('.screen').forEach(s=>s.classList.toggle('active',s.id==='s-'+id));
+  current=id;
+  const show=id==='splash'?'none':'flex';
+  $('#homeBtn').style.display=show;$('#gearBtn').style.display=show;
+  $('#settings').classList.remove('open');
+  $('#s-'+id).scrollTop=0;
+  if(hooks[id])hooks[id]();
+}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-go]');if(b)go(b.dataset.go)});
+$('#homeBtn').onclick=()=>go('menu');
+
+/* ---------- Splash ---------- */
+$('#ttl').innerHTML=[...'RELATIVITAS'].map((c,i)=>`<span style="--i:${i}">${c}</span>`).join('');
+const nameSplash=$('#nameSplash');
+nameSplash.value=S.name;
+nameSplash.addEventListener('input',()=>{S.name=nameSplash.value;});
+nameSplash.addEventListener('change',save);
+const kelasSplash=$('#kelasSplash');
+kelasSplash.value=S.kelas;
+kelasSplash.addEventListener('input',()=>{S.kelas=kelasSplash.value;});
+kelasSplash.addEventListener('change',save);
+nameSplash.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();kelasSplash.focus()}});
+kelasSplash.addEventListener('keydown',e=>{if(e.key==='Enter')startApp()});
+$('#startBtn').onclick=startApp;
+function startApp(){
+  S.name=nameSplash.value;S.kelas=kelasSplash.value;save();
+  Aud.resume();if(S.music)Aud.startMusic();
+  go('menu');
+}
+
+/* ---------- Menu & Beranda ---------- */
+hooks.menu=()=>{$('#greet').textContent=S.name.trim()?`Halo, ${S.name.trim()}! Pilih petualanganmu hari ini. ⚡`:'Halo, Sobat Fisika! Pilih petualanganmu hari ini. ⚡'};
+const FACTS=[
+ 'Jam atom pada satelit GPS berjalan berbeda ±38 mikrodetik per hari dibanding jam di Bumi. Tanpa koreksi relativitas, kesalahan posisi bisa mencapai ±10 km per hari!',
+ 'Stasiun Antariksa Internasional (ISS) melaju ±7,66 km/s. Efek kecepatan saja membuat jam astronaut tertinggal beberapa milidetik setiap 6 bulan.',
+ 'Proton di Large Hadron Collider memiliki γ ≈ 7000. Bagi proton yang melaju hampir secepat cahaya, waktu terasa sangat lambat dibanding laboratorium.',
+ 'Nama "faktor Lorentz" diambil dari Hendrik Lorentz, fisikawan Belanda. Rumus ini sudah dikenal sebelum Einstein memberi makna fisis yang baru.',
+ 'Muon sinar kosmik hanya hidup ±2,2 mikrodetik, tetapi bisa mencapai permukaan Bumi dari puluhan kilometer di atas. Dilatasi waktu menjelaskannya!'
+];
+let factI=-1;
+hooks.beranda=()=>{
+  $('#berandaHi').innerHTML=`Halo <b>${esc(S.name.trim()||'Sobat Fisika')}</b>! Pernahkah kamu membayangkan waktu berjalan berbeda bagi dua orang? Media ini mengajakmu menjelajah <b>dilatasi waktu</b>, salah satu konsekuensi paling mengejutkan dari teori relativitas khusus Einstein.`;
+};
+$('#factBtn').onclick=()=>{factI=(factI+1)%FACTS.length;$('#factTxt').textContent=FACTS[factI]};
+
+/* =====================================================================
+   MATERI
+   ===================================================================== */
+const sceneSVG=`<svg class="ill" viewBox="0 0 360 90"><use href="#i-earth" x="10" y="0" width="90" height="90"/><use href="#i-clock" x="135" y="0" width="90" height="90"/><use href="#i-rocket" x="245" y="15" width="110" height="55"/></svg>`;
+const rv=(t,b)=>`<div class="rv"><button class="rv-btn" data-rv>${t}</button><div class="rv-body">${b}</div></div>`;
+const FR=`<span class="frac"><i>1</i><i>√(1 − v²/c²)</i></span>`;
+
+const TABS=[
+{icon:'🌌',title:'1. Pendahuluan',html:()=>`
+ <h2 class="h2 grad">Apakah Waktu Itu Mutlak?</h2>
+ ${sceneSVG}
+ <p class="p mt">Dalam fisika Newton, waktu mengalir sama bagi semua orang. Tahun 1905, Albert Einstein mengusulkan hal mengejutkan: <b>waktu bergantung pada gerak pengamat</b>. Gagasan ini lahir dari dua postulat. Klik untuk membukanya!</p>
+ ${rv('📜 Postulat I: Prinsip Relativitas','Hukum-hukum fisika <b>berlaku sama</b> bagi semua pengamat dalam kerangka acuan inersia (kerangka yang bergerak lurus beraturan atau diam).')}
+ ${rv('💡 Postulat II: Kelajuan Cahaya Tetap','Kelajuan cahaya dalam vakum, <b>c ≈ 3 × 10⁸ m/s</b>, selalu sama bagi semua pengamat inersia, <b>tidak bergantung</b> pada gerak sumber cahaya maupun pengamat.')}
+ ${rv('🤔 Apa akibatnya?','Jika kelajuan cahaya selalu sama, maka <b>ruang dan waktu</b> yang harus "mengalah". Hasilnya: selang waktu dan panjang yang diukur dapat berbeda bagi pengamat yang bergerak relatif. Salah satunya adalah <b>dilatasi waktu</b>.')}
+ ${rv('🔑 Dua istilah penting','<b>Waktu proper (Δt₀)</b>: selang waktu yang diukur pengamat yang <i>diam terhadap jam</i> (kedua peristiwa terjadi di tempat yang sama).<br><b>Waktu dilatasi (Δt)</b>: selang waktu yang diukur pengamat yang <i>bergerak relatif</i> terhadap jam.')}
+ ${rv('❓ Pertanyaan pemantik','Bayangkan kembaranmu terbang dengan pesawat berkecepatan 0,8c lalu pulang. Siapa yang lebih tua? Jawabannya akan kamu temukan di halaman berikutnya!')}
+`},
+{icon:'⏱️',title:'2. Konsep Dilatasi',html:()=>`
+ <h2 class="h2 grad">Jam Cahaya: Mengapa Waktu Melambat?</h2>
+ <p class="p mt">Bayangkan jam yang "berdetak" saat pulsa cahaya memantul antara dua cermin. Satu tik = pulsa pergi-pulang. Bandingkan jam yang <b>diam</b> dengan jam yang <b>bergerak 0,6c</b>.</p>
+ <div class="two">
+  <div class="panel"><div class="cap">Jam cahaya <b>diam</b></div>
+   <svg viewBox="0 0 300 230" class="svgbox">
+    <rect x="130" y="36" width="40" height="8" rx="3" fill="#94a3b8"/><rect x="130" y="186" width="40" height="8" rx="3" fill="#94a3b8"/>
+    <line x1="150" y1="44" x2="150" y2="186" stroke="#22d3ee" stroke-dasharray="5 5" opacity=".6"/>
+    <circle id="phL" cx="150" cy="186" r="7" fill="#fde047"/>
+    <text x="160" y="120" fill="#a5f3fc" font-size="15">L</text>
+    <text x="150" y="220" text-anchor="middle" fill="#cbd5e1" font-size="13">1 tik = 2L/c = Δt₀</text>
+   </svg><div class="tick">Jumlah tik: <b id="tkL">0</b></div></div>
+  <div class="panel"><div class="cap">Jam cahaya <b>bergerak 0,6c</b> (dilihat dari Bumi)</div>
+   <svg viewBox="0 0 300 230" class="svgbox">
+    <polyline points="30,186 136.5,44 243,186" fill="none" stroke="#f472b6" stroke-width="2" stroke-dasharray="6 5" opacity=".7"/>
+    <rect id="mbT" x="10" y="36" width="40" height="8" rx="3" fill="#94a3b8"/><rect id="mbB" x="10" y="186" width="40" height="8" rx="3" fill="#94a3b8"/>
+    <circle id="phR" cx="30" cy="186" r="7" fill="#fde047"/>
+    <text x="150" y="220" text-anchor="middle" fill="#cbd5e1" font-size="13">lintasan lebih panjang → tik lebih lama</text>
+   </svg><div class="tick">Jumlah tik: <b id="tkR">0</b></div></div>
+ </div>
+ <p class="muted mt center-t">Cahaya menempuh lintasan miring yang lebih panjang, padahal kelajuannya tetap c. Akibatnya satu tik jam yang bergerak <b>lebih lama</b> (jam berjalan lebih lambat).</p>
+ <div class="mt2"><h3 class="h3">🧩 Menurunkan rumus (buka langkah demi langkah)</h3>
+  <div class="steps">
+   <div class="step">① <b>Pengamat di pesawat</b> (diam terhadap jam): cahaya menempuh 2L, sehingga <b>Δt₀ = 2L / c</b>.</div>
+   <div class="step">② <b>Pengamat di Bumi</b>: jam bergerak sejauh vΔt. Setengah lintasan cahaya miring dengan panjang cΔt/2 sehingga <b>(cΔt/2)² = L² + (vΔt/2)²</b>.</div>
+   <div class="step">③ Kalikan 4: (cΔt)² = (2L)² + (vΔt)², sehingga <b>Δt²(c² − v²) = 4L²</b>, maka Δt = 2L / (c√(1 − v²/c²)).</div>
+   <div class="step">④ Substitusi Δt₀ = 2L/c, hasilnya <b>Δt = Δt₀ / √(1 − v²/c²) = γ Δt₀</b> ✔</div>
+   <button class="btn am mt" data-next-step>Tampilkan langkah berikutnya ▶</button>
+  </div></div>
+ <div class="formula">Δt = γ · Δt₀ &nbsp;&nbsp; dengan &nbsp; γ = ${FR}</div>
+ <div class="two">
+  <div class="box"><b>Δt₀</b> = waktu proper (diukur pengamat yang <i>diam</i> terhadap jam)</div>
+  <div class="box"><b>Δt</b> = waktu menurut pengamat yang <i>bergerak relatif</i> terhadap jam; Δt ≥ Δt₀</div>
+ </div>
+`,init:root=>{
+  const yb=186,yt=44,dx=106.5,x0=30;
+  const phL=$('#phL',root),phR=$('#phR',root),mT=$('#mbT',root),mB=$('#mbB',root),tkL=$('#tkL',root),tkR=$('#tkR',root);
+  const t0=performance.now();
+  loopTab(t=>{
+    const e=t-t0,ul=((e%2000)/2000)*2,ur=((e%2500)/2500)*2;
+    phL.setAttribute('cy',ul<1?yb-(yb-yt)*ul:yt+(yb-yt)*(ul-1));
+    const cx=x0+dx*ur;
+    phR.setAttribute('cx',cx);phR.setAttribute('cy',ur<1?yb-(yb-yt)*ur:yt+(yb-yt)*(ur-1));
+    mT.setAttribute('x',cx-20);mB.setAttribute('x',cx-20);
+    tkL.textContent=Math.floor(e/2000);tkR.textContent=Math.floor(e/2500);
+  });
+}},
+{icon:'🎛️',title:'3. Faktor Lorentz & Simulator',html:()=>`
+ <h2 class="h2 grad">Faktor Lorentz (γ) &amp; Simulator Kecepatan</h2>
+ <div class="formula">γ = ${FR}</div>
+ <p class="p">Semakin cepat benda (v → c), nilai <b>γ makin besar</b>. Geser slider untuk mengubah kecepatan pesawat dan amati dua jam: jam Bumi dan jam pesawat.</p>
+ <div class="panel mt">
+  <div class="row" style="justify-content:space-between"><b>Kecepatan pesawat</b><span class="chipv" id="vOut">v = 0,600 c</span></div>
+  <input id="vSlider" class="sl" type="range" min="0" max="999" value="600">
+  <div class="row mt">
+   <button class="btn gh" data-pre="500">0,5c</button><button class="btn gh" data-pre="800">0,8c</button><button class="btn gh" data-pre="900">0,9c</button><button class="btn gh" data-pre="990">0,99c</button><button class="btn gh" data-pre="999">0,999c</button>
+  </div>
+ </div>
+ <div class="two">
+  <div class="panel center-t"><div class="cap">🌍 Jam di Bumi</div>
+   <svg viewBox="0 0 100 100" style="width:120px"><circle cx="50" cy="50" r="46" fill="#0f172a" stroke="#34d399" stroke-width="5"/><circle cx="50" cy="50" r="38" fill="none" stroke="#a7f3d0" stroke-width="4" stroke-dasharray="2 17.9"/><line id="handE" x1="50" y1="50" x2="50" y2="14" stroke="#fde047" stroke-width="5" stroke-linecap="round"/><circle cx="50" cy="50" r="4" fill="#fff"/></svg>
+   <div class="big-n" id="timeE">0,0 s</div></div>
+  <div class="panel center-t"><div class="cap">🚀 Jam di pesawat</div>
+   <svg viewBox="0 0 100 100" style="width:120px"><circle cx="50" cy="50" r="46" fill="#0f172a" stroke="#f472b6" stroke-width="5"/><circle cx="50" cy="50" r="38" fill="none" stroke="#fbcfe8" stroke-width="4" stroke-dasharray="2 17.9"/><line id="handS" x1="50" y1="50" x2="50" y2="14" stroke="#fde047" stroke-width="5" stroke-linecap="round"/><circle cx="50" cy="50" r="4" fill="#fff"/></svg>
+   <div class="big-n" id="timeS">0,0 s</div></div>
+ </div>
+ <div class="box mt center-t"><div>Faktor Lorentz <b>γ = <span id="gOut" class="big-n">1,25</span></b></div><div class="p" id="simMsg"></div></div>
+ <h3 class="h3 mt2">📈 Grafik γ terhadap v/c</h3>
+ <canvas id="gCanvas" width="640" height="320" style="width:100%;height:auto;background:rgba(2,6,30,.5);border-radius:14px;margin-top:8px"></canvas>
+ <h3 class="h3 mt2">📋 Tabel nilai γ</h3>
+ <table class="tbl"><thead><tr><th>v/c</th><th>γ</th><th>1 tahun di pesawat = … tahun di Bumi</th></tr></thead><tbody id="gTbl"></tbody></table>
+ ${rv('🚗 Mengapa kita tidak merasakannya sehari-hari?','Mobil 100 km/jam hanya ±10⁻⁷ c, sehingga γ − 1 ≈ 10⁻¹⁵. Selisihnya begitu kecil, hanya jam atom yang dapat mendeteksinya. Efek baru terasa jika v mendekati c.')}
+`,init:root=>{
+  const sl=$('#vSlider',root),vo=$('#vOut',root),go_=$('#gOut',root),msg=$('#simMsg',root),hE=$('#handE',root),hS=$('#handS',root),tE=$('#timeE',root),tS=$('#timeS',root),cv=$('#gCanvas',root);
+  $('#gTbl',root).innerHTML=[0,.1,.3,.5,.6,.8,.9,.99,.999].map(b=>`<tr><td>${fmt(b,3)}</td><td>${fmt(gam(b),3)}</td><td>${fmt(gam(b),2)}</td></tr>`).join('');
+  let beta=.6,E=0,Sh=0,last=performance.now();
+  function upd(){
+    const g=gam(beta);
+    vo.textContent='v = '+fmt(beta,3)+' c';go_.textContent=fmt(g,3);
+    msg.innerHTML=`1 jam di pesawat ≈ <b>${fmt(g,2)} jam</b> di Bumi. Jam pesawat berjalan <b>${fmt(100/g,1)}%</b> dari laju jam Bumi.`;
+    drawGraph(cv,beta);
+  }
+  sl.addEventListener('input',()=>{beta=sl.value/1000;upd()});
+  $$('[data-pre]',root).forEach(b=>b.addEventListener('click',()=>{sl.value=b.dataset.pre;beta=sl.value/1000;upd()}));
+  upd();
+  loopTab(t=>{
+    const dt=Math.min((t-last)/1000,.1);last=t;
+    E+=dt;Sh+=dt/gam(beta);
+    hE.setAttribute('transform','rotate('+((E%10)/10*360)+' 50 50)');
+    hS.setAttribute('transform','rotate('+((Sh%10)/10*360)+' 50 50)');
+    tE.textContent=fmt(E,1)+' s';tS.textContent=fmt(Sh,1)+' s';
+  });
+}},
+{icon:'🧮',title:'4. Contoh Soal',html:()=>`
+ <h2 class="h2 grad">Contoh Soal &amp; Pembahasan</h2>
+ <p class="p mt">Coba kerjakan sendiri dahulu, lalu klik untuk melihat pembahasan.</p>
+ <div class="box mt"><b>Soal 1.</b> Seorang astronaut berada di pesawat yang melaju 0,8c. Menurut jam pesawat, perjalanan berlangsung 6 tahun. Berapa lama perjalanan itu menurut pengamat di Bumi?</div>
+ ${rv('👀 Lihat pembahasan Soal 1','Diketahui: v = 0,8c; Δt₀ = 6 tahun (waktu proper di pesawat).<br>γ = 1/√(1 − 0,8²) = 1/√0,36 = 1/0,6 = <b>5/3 ≈ 1,67</b><br>Δt = γ Δt₀ = (5/3)(6) = <b>10 tahun</b>.<br>Jadi di Bumi berlalu 10 tahun, sedangkan astronaut hanya menua 6 tahun.')}
+ <div class="box mt2"><b>Soal 2.</b> Muon memiliki umur proper 2,2 µs. Muon itu melaju 0,99c (γ ≈ 7,09) relatif terhadap Bumi. Berapa umurnya menurut pengamat di Bumi dan berapa jarak yang ditempuhnya?</div>
+ ${rv('👀 Lihat pembahasan Soal 2','Δt = γ Δt₀ = 7,09 × 2,2 µs ≈ <b>15,6 µs</b>.<br>Jarak = vΔt ≈ 0,99 × (3×10⁸) × 15,6×10⁻⁶ ≈ <b>4,6 km</b>.<br>Tanpa dilatasi, jaraknya hanya ≈ 0,99 × 3×10⁸ × 2,2×10⁻⁶ ≈ 650 m. Dilatasi waktu memperpanjang jangkauan muon.')}
+ <div class="box mt2"><b>Soal 3.</b> Jam yang bergerak dicatat pengamat di Bumi selama 25 tahun, sedangkan jam itu sendiri mencatat 20 tahun. Berapa faktor γ dan kecepatan jam tersebut?</div>
+ ${rv('👀 Lihat pembahasan Soal 3','γ = Δt/Δt₀ = 25/20 = <b>1,25</b>.<br>γ = 1/√(1 − β²) → 1 − β² = 1/γ² = 0,64 → β² = 0,36 → <b>β = 0,6</b>, jadi v = 0,6c.')}
+ <div class="box mt2"><b>Strategi umum:</b> (1) tentukan mana waktu proper Δt₀, (2) hitung γ, (3) gunakan Δt = γΔt₀. Waktu proper adalah yang <i>terpendek</i>.</div>
+`},
+{icon:'🌍',title:'5. Penerapan Sehari-hari',html:()=>`
+ <h2 class="h2 grad">Dilatasi Waktu dalam Kehidupan Nyata</h2>
+ <p class="p mt">Dilatasi waktu bukan sekadar teori. Klik setiap kartu untuk melihat bagaimana ia bekerja di sekitar kita.</p>
+ ${rv('🛰️ GPS di ponselmu','Satelit GPS mengorbit pada ketinggian ±20.200 km dengan kelajuan ±3,9 km/s. Efek kecepatan membuat jam satelit <i>lebih lambat</i> ±7 µs/hari, sedangkan efek gravitasi (relativitas umum) membuatnya <i>lebih cepat</i> ±45 µs/hari. Selisih bersih ±38 µs/hari. Tanpa koreksi, kesalahan posisi dapat bertambah sekitar 10 km per hari, sehingga navigasi petamu tidak akan akurat.')}
+ ${rv('☄️ Muon dari sinar kosmik','Muon tercipta di atmosfer atas (±15 km) dan hanya hidup ±2,2 µs saat diam. Tanpa dilatasi, jangkauannya hanya ±650 m. Karena melaju ±0,998c (γ ≈ 16), umurnya menurut kita ±35 µs sehingga banyak muon mencapai permukaan Bumi. Ini bukti eksperimen yang klasik.')}
+ ${rv('⚛️ Akselerator partikel (LHC)','Proton di LHC dipercepat hingga γ ≈ 7000. Para ilmuwan harus memperhitungkan dilatasi waktu agar umur partikel tidak-stabil yang dihasilkan dapat dihitung dengan benar, termasuk saat merancang detektor.')}
+ ${rv('🧑‍🚀 Astronaut di ISS','ISS melaju ±7,66 km/s. Efek kecepatan membuat jam astronaut tertinggal beberapa milidetik per 6 bulan dibanding jam di Bumi. Sangat kecil, tetapi nyata dan terukur oleh jam atom.')}
+ ${rv('✈️ Eksperimen Hafele–Keating (1971)','Jam atom cesium dibawa mengelilingi dunia dengan pesawat komersial. Setelah kembali, jam itu berbeda dengan jam di darat sebesar ratusan nanodetik, sesuai prediksi relativitas.')}
+ ${rv('🌟 Perjalanan antarbintang (gagasan)','Jika pesawat dapat melaju 0,99c (γ ≈ 7), perjalanan 7 tahun menurut Bumi hanya terasa ±1 tahun oleh awak pesawat. Kini hanya gagasan teoretis, tetapi menjelaskan "paradoks kembar".')}
+ <div class="box mt2"><b>🎒 Refleksi:</b> Sebutkan satu teknologi di sekitarmu yang bergantung pada pemahaman relativitas! (Petunjuk: lihat layar ponselmu saat membuka peta.)</div>
+`},
+{icon:'🏁',title:'6. Rangkuman',html:()=>`
+ <h2 class="h2 grad">Rangkuman</h2>
+ ${sceneSVG}
+ <ul class="list">
+  <li>Kelajuan cahaya <b>c tetap</b> bagi semua pengamat inersia; waktu dan jarak bersifat relatif.</li>
+  <li>Dilatasi waktu: <b>Δt = γ Δt₀</b>, γ = 1/√(1 − v²/c²) ≥ 1.</li>
+  <li>Waktu proper Δt₀ diukur oleh pengamat yang <b>diam terhadap jam</b> (selalu yang terpendek).</li>
+  <li>Efek menjadi nyata saat v mendekati c; pada kecepatan sehari-hari nyaris nol.</li>
+  <li>Penerapan: <b>GPS, muon kosmik, akselerator partikel, astronaut ISS</b>, dan eksperimen jam atom.</li>
+ </ul>
+ <div class="formula">Δt = γΔt₀ &nbsp;|&nbsp; γ = ${FR}</div>
+ <div class="row c mt2"><button class="btn pk" data-go="kuis">🎮 Main Kuis</button><button class="btn am" data-go="simulasi">🧪 Uji Pemahaman</button></div>
+`}
+];
+const mState={tab:0};
+hooks.materi=()=>{cleanups.push(stopTab);renderMateri()};
+function renderMateri(){
+  stopTab();
+  $('#mTabs').innerHTML=TABS.map((t,i)=>`<button class="tab ${i===mState.tab?'on':''}" data-i="${i}">${t.icon} ${t.title}</button>`).join('');
+  const box=$('#mBody');box.innerHTML=TABS[mState.tab].html();
+  if(TABS[mState.tab].init)TABS[mState.tab].init(box);
+  $('#mPrev').disabled=mState.tab===0;
+  const last=mState.tab===TABS.length-1;
+  $('#mNext').disabled=last;
+  $('#mPage').textContent=`Halaman ${mState.tab+1} / ${TABS.length}`;
+  $('#s-materi').scrollTop=0;
+  const on=$('#mTabs .on');if(on)on.scrollIntoView({block:'nearest',inline:'center'});
+}
+$('#mTabs').addEventListener('click',e=>{const b=e.target.closest('[data-i]');if(b){mState.tab=+b.dataset.i;renderMateri()}});
+$('#mPrev').onclick=()=>{if(mState.tab>0){mState.tab--;renderMateri()}};
+$('#mNext').onclick=()=>{if(mState.tab<TABS.length-1){mState.tab++;renderMateri()}};
+$('#mBody').addEventListener('click',e=>{
+  const r=e.target.closest('[data-rv]');
+  if(r){r.classList.toggle('open');r.nextElementSibling.classList.toggle('open')}
+  const n=e.target.closest('[data-next-step]');
+  if(n){
+    const box=n.parentElement,nx=$('.step:not(.show)',box);
+    if(nx)nx.classList.add('show');
+    if(!$('.step:not(.show)',box)){n.textContent='Semua langkah terbuka ✔';n.disabled=true}
+  }
+});
+function drawGraph(cv,beta){
+  const c=cv.getContext('2d'),W=cv.width,H=cv.height,m={l:52,r:16,t:16,b:40},pw=W-m.l-m.r,ph=H-m.t-m.b,gmax=8;
+  c.clearRect(0,0,W,H);c.font='14px sans-serif';c.lineWidth=1;
+  for(let g=1;g<=gmax;g++){
+    const y=H-m.b-ph*(g-1)/(gmax-1);
+    c.strokeStyle='rgba(255,255,255,.1)';c.beginPath();c.moveTo(m.l,y);c.lineTo(W-m.r,y);c.stroke();
+    c.fillStyle='#b8c7ee';c.textAlign='right';c.fillText(g,m.l-8,y+4);
+  }
+  c.textAlign='center';
+  for(let i=0;i<=5;i++){const x=m.l+pw*i/5;c.fillStyle='#b8c7ee';c.fillText(fmt(i/5,1),x,H-m.b+18)}
+  c.fillStyle='#fde68a';c.fillText('v / c',m.l+pw/2,H-6);
+  c.save();c.translate(14,m.t+ph/2);c.rotate(-Math.PI/2);c.fillText('γ',0,0);c.restore();
+  c.strokeStyle='rgba(255,255,255,.4)';c.beginPath();c.moveTo(m.l,m.t);c.lineTo(m.l,H-m.b);c.lineTo(W-m.r,H-m.b);c.stroke();
+  c.strokeStyle='#22d3ee';c.lineWidth=3;c.beginPath();let first=true;
+  for(let b=0;b<=.995;b+=.002){const g=gam(b);if(g>gmax)break;const x=m.l+pw*b,y=H-m.b-ph*(g-1)/(gmax-1);first?c.moveTo(x,y):c.lineTo(x,y);first=false}
+  c.stroke();
+  const g=Math.min(gam(beta),gmax),x=m.l+pw*beta,y=H-m.b-ph*(g-1)/(gmax-1);
+  c.setLineDash([5,5]);c.strokeStyle='rgba(253,224,71,.7)';c.lineWidth=1.5;c.beginPath();c.moveTo(x,H-m.b);c.lineTo(x,y);c.lineTo(m.l,y);c.stroke();c.setLineDash([]);
+  c.fillStyle='#fbbf24';c.beginPath();c.arc(x,y,8,0,6.283);c.fill();c.strokeStyle='#fff';c.lineWidth=2;c.stroke();
+}
+
+/* =====================================================================
+   UTIL JAWABAN
+   ===================================================================== */
+function parseNum(s){
+  s=String(s).trim().toLowerCase().replace(/\s/g,'').replace(/c$/,'').replace(/%$/,'');
+  if(!s)return NaN;
+  if(s.includes('/')){const [a,b]=s.split('/');return parseFloat(a.replace(',','.'))/parseFloat(b.replace(',','.'))}
+  return parseFloat(s.replace(',','.'));
+}
+const norm=w=>w.toLowerCase().replace(/[^\p{L}\p{N}-]/gu,'');
+const fbHTML=(ok,exp)=>`<div class="fb ${ok?'ok':'bad'}"><b>${ok?'🎉 Benar!':'❌ Belum tepat.'}</b> ${exp}</div>`;
+
+/* =====================================================================
+   SIMULASI: 10 SOAL
+   ===================================================================== */
+const SIMQ=[
+ {type:'pg',label:'Pilihan Ganda · Hitung γ',q:'Sebuah pesawat melaju dengan kecepatan v = 0,6c. Nilai faktor Lorentz γ adalah …',o:['0,80','1,00','1,25','1,67'],a:2,exp:'γ = 1/√(1 − 0,6²) = 1/√0,64 = 1/0,8 = <b>1,25</b>.'},
+ {type:'pg',label:'Pilihan Ganda · Hitung Δt',q:'Sebuah jam pada pesawat yang melaju 0,8c mencatat selang waktu proper Δt₀ = 8 s. Menurut pengamat di Bumi, selang waktu tersebut adalah …',o:['4,8 s','8,0 s','10,0 s','13,3 s'],a:3,exp:'γ = 1/√(1 − 0,64) = 5/3, maka Δt = γΔt₀ = (5/3)(8) ≈ <b>13,3 s</b>.'},
+ {type:'pg',label:'Pilihan Ganda · Hitung v',q:'Pengamat di Bumi mencatat 5 s untuk sebuah jam yang bergerak, sedangkan jam itu sendiri mencatat 3 s. Kecepatan jam tersebut adalah …',o:['0,6c','0,8c','0,9c','0,95c'],a:1,exp:'γ = Δt/Δt₀ = 5/3. Maka 1 − β² = 1/γ² = 9/25 = 0,36 sehingga β² = 0,64 dan <b>β = 0,8</b> (v = 0,8c).'},
+ {type:'drag',label:'Drag the Word · Lengkapi Hitungan',text:'Pada v = 0,6c diperoleh γ = {0}. Jika waktu proper 10 tahun, maka di Bumi berlalu {1} tahun.',bank:['1,25','12,5','8','1,67'],ans:['1,25','12,5'],exp:'γ = 1/√(1 − 0,36) = 1,25 sehingga Δt = γΔt₀ = 1,25 × 10 = <b>12,5 tahun</b>.'},
+ {type:'drag',label:'Drag the Word · Lengkapi Hitungan',text:'Pada v = 0,8c diperoleh γ = {0}. Astronaut yang mengalami 3 tahun perjalanan (waktu proper) berarti di Bumi berlalu {1} tahun.',bank:['1,67','5','1,25','3,75'],ans:['1,67','5'],exp:'γ = 1/0,6 ≈ 1,67 sehingga Δt = (5/3)(3) = <b>5 tahun</b>.'},
+ {type:'isian',label:'Isian Singkat · Hitung γ',q:'Sebuah pesawat melaju dengan kecepatan 0,8c. Hitung faktor Lorentz γ (dua desimal).',hint:'Contoh format: 1,25',chk:x=>Math.abs(x-5/3)<.011,exp:'γ = 1/√(1 − 0,64) = 1/0,6 = 5/3 ≈ <b>1,67</b>.'},
+ {type:'isian',label:'Isian Singkat · Hitung Waktu Proper',q:'Pengamat di Bumi mencatat selang waktu 25 tahun untuk sebuah pesawat yang memiliki γ = 1,25. Berapa tahun waktu proper yang dialami awak pesawat?',hint:'Tulis angkanya saja',chk:x=>Math.abs(x-20)<.06,exp:'Δt₀ = Δt/γ = 25/1,25 = <b>20 tahun</b>.'},
+ {type:'mark',label:'Mark the Word · Konsep',prompt:'Tandai SEMUA kata yang TIDAK berpengaruh terhadap besar dilatasi waktu.',text:'Dilatasi waktu makin besar jika benda bergerak makin cepat mendekati kelajuan cahaya, sedangkan warna, massa, dan merek jam tidak berpengaruh sama sekali.',correct:['warna','massa','merek'],exp:'Dilatasi waktu hanya ditentukan oleh perbandingan kecepatan relatif terhadap c (lewat γ), bukan warna, massa, atau merek jam.'},
+ {type:'mark',label:'Mark the Word · Periksa Hitungan',prompt:'Seorang siswa menghitung: jam bergerak dengan γ = 2 dan waktu proper 6 jam. Kalimat hasilnya mengandung 2 kata yang SALAH. Tandai kedua kata tersebut!',text:'Waktu menurut pengamat diam lebih singkat, yaitu 12 jam, karena waktu proper dibagi γ.',correct:['singkat','dibagi'],exp:'Seharusnya: waktu menurut pengamat diam <b>lebih panjang</b>, yaitu 12 jam, karena waktu proper <b>dikali</b> γ (Δt = γΔt₀ = 2 × 6 = 12 jam).'},
+ {type:'pg',label:'Pilihan Ganda · Penerapan Muon',q:'Muon memiliki umur proper 2,2 µs dan melaju dengan γ ≈ 15,8 terhadap Bumi. Umur muon menurut pengamat di Bumi adalah sekitar …',o:['2,2 µs','13,9 µs','34,8 µs','347,6 µs'],a:2,exp:'Δt = γΔt₀ = 15,8 × 2,2 µs ≈ <b>34,8 µs</b>. Karena umurnya diperpanjang, muon dapat menempuh jarak jauh dan mencapai permukaan Bumi.'}
+];
+const SIM={i:0,res:[],t0:0};
+hooks.simulasi=()=>simIntro();
+function simIntro(){
+  const b=$('#simBody');
+  b.innerHTML=`
+  <div class="glass pad center-t">
+   <h2 class="h2 grad">🧪 Simulasi: Uji Pemahaman</h2>
+   ${sceneSVG}
+   <p class="p mt">10 soal: <b>Pilihan Ganda, Drag the Word, Isian Singkat,</b> dan <b>Mark the Word</b>. Setiap soal bernilai 10. Nilaimu akan direkap dan kamu mendapat <b>Sertifikat Pencapaian</b>.</p>
+   <div class="nameBox mt2" style="animation:none">
+    <input id="simName" class="inp" type="text" maxlength="40" autocomplete="off" autocapitalize="words" spellcheck="false" placeholder="✏️ Ketik namamu (untuk sertifikat)">
+    <input id="simKelas" class="inp" style="margin-top:10px" type="text" maxlength="20" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="🏫 Ketik kelasmu (mis. XII IPA 1)">
+   </div>
+   <div class="row c mt2"><button id="simStart" class="btn am big">▶ MULAI UJI</button></div>
+  </div>`;
+  const inp=$('#simName');inp.value=S.name;
+  inp.addEventListener('input',()=>{S.name=inp.value});
+  inp.addEventListener('change',save);
+  const kin=$('#simKelas');kin.value=S.kelas;
+  kin.addEventListener('input',()=>{S.kelas=kin.value});
+  kin.addEventListener('change',save);
+  inp.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();kin.focus()}});
+  kin.addEventListener('keydown',e=>{if(e.key==='Enter')start()});
+  $('#simStart').onclick=start;
+  function start(){
+    S.name=inp.value;S.kelas=kin.value;save();
+    if(!S.name.trim()){toast('Isi namamu dulu ya, agar tampil di sertifikat ✏️');inp.focus();return}
+    if(!S.kelas.trim()){toast('Isi kelasmu dulu ya 🏫');kin.focus();return}
+    SIM.i=0;SIM.res=[];SIM.t0=Date.now();simQ();
+  }
+}
+const BUILD={
+  pg(q,area){
+    const opts=shuffle(q.o.map((t,k)=>({t,ok:k===q.a})));let sel=-1;
+    area.innerHTML=`<div class="opts">${opts.map((o,i)=>`<button class="opt" data-i="${i}">${String.fromCharCode(65+i)}. ${esc(o.t)}</button>`).join('')}</div>`;
+    let locked=false;
+    area.addEventListener('click',e=>{const b=e.target.closest('.opt');if(!b||locked)return;sel=+b.dataset.i;$$('.opt',area).forEach(x=>x.classList.toggle('sel',x===b))});
+    return{ready:()=>sel>=0,eval:()=>opts[sel].ok,reveal(){locked=true;$$('.opt',area).forEach((b,i)=>{b.disabled=true;b.classList.remove('sel');if(opts[i].ok)b.classList.add('ok');else if(i===sel)b.classList.add('bad')})}};
+  },
+  drag(q,area){
+    const parts=q.text.split(/\{(\d+)\}/);const n=q.ans.length;const fill=Array(n).fill(null);let sel=null,locked=false;
+    const bank=shuffle(q.bank);
+    function render(){
+      let html='<div class="qtext">';
+      parts.forEach((p,i)=>{if(i%2===0)html+=esc(p);else{const k=+p;html+=`<button class="blank ${fill[k]?'filled':''}" data-b="${k}">${fill[k]?esc(fill[k]):'&nbsp;&nbsp;&nbsp;&nbsp;'}</button>`}});
+      html+='</div><p class="muted">Seret kata ke kotak. Di layar sentuh: ketuk kata, lalu ketuk kotak. Ketuk kotak terisi untuk mengosongkan.</p><div class="bank">';
+      bank.forEach(w=>{const used=fill.includes(w);html+=`<button class="chip ${used?'used':''} ${sel===w?'sel':''}" draggable="${!used&&!locked}" data-w="${esc(w)}">${esc(w)}</button>`});
+      html+='</div>';area.innerHTML=html;
+    }
+    function place(k,w){const prev=fill.indexOf(w);if(prev>=0)fill[prev]=null;fill[k]=w;sel=null;render()}
+    area.addEventListener('click',e=>{
+      if(locked)return;
+      const c=e.target.closest('.chip'),b=e.target.closest('.blank');
+      if(c&&!c.classList.contains('used')){sel=sel===c.dataset.w?null:c.dataset.w;render()}
+      else if(b){const k=+b.dataset.b;if(fill[k]){fill[k]=null;render()}else if(sel){place(k,sel)}}
+    });
+    area.addEventListener('dragstart',e=>{const c=e.target.closest('.chip');if(!c||locked)return;e.dataTransfer.setData('text/plain',c.dataset.w);e.dataTransfer.effectAllowed='move'});
+    area.addEventListener('dragover',e=>{if(e.target.closest('.blank')&&!locked)e.preventDefault()});
+    area.addEventListener('drop',e=>{const b=e.target.closest('.blank');if(!b||locked)return;e.preventDefault();const w=e.dataTransfer.getData('text/plain');if(w)place(+b.dataset.b,w)});
+    render();
+    return{ready:()=>fill.every(Boolean),eval:()=>fill.every((w,i)=>w===q.ans[i]),reveal(){locked=true;render();$$('.blank',area).forEach((b,i)=>{b.disabled=true;b.classList.add(fill[i]===q.ans[i]?'ok':'bad')});$$('.chip',area).forEach(c=>c.disabled=true)}};
+  },
+  isian(q,area){
+    area.innerHTML=`<div class="qtext">${esc(q.q)}</div><input id="ansIn" class="inp" type="text" inputmode="text" autocomplete="off" spellcheck="false" placeholder="Ketik jawabanmu… ${esc(q.hint||'')}">`;
+    const inp=$('#ansIn',area);setTimeout(()=>inp.focus(),50);
+    inp.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();$('#chk').click()}});
+    return{ready:()=>inp.value.trim()!=='',eval:()=>{const x=parseNum(inp.value);return !isNaN(x)&&q.chk(x)},reveal(ok){inp.readOnly=true;inp.style.borderColor=ok?'#34d399':'#fb7185'}};
+  },
+  mark(q,area){
+    const toks=q.text.split(/\s+/);const marked=new Set();let locked=false;
+    area.innerHTML=`<div class="qtext">${esc(q.prompt)}</div><p class="muted">Ketuk kata untuk menandai; ketuk lagi untuk membatalkan.</p><div class="mtxt">${toks.map((t,i)=>`<button class="tok" data-i="${i}">${esc(t)}</button>`).join(' ')}</div>`;
+    area.addEventListener('click',e=>{const b=e.target.closest('.tok');if(!b||locked)return;const i=+b.dataset.i;marked.has(i)?marked.delete(i):marked.add(i);b.classList.toggle('m',marked.has(i))});
+    const isC=i=>q.correct.includes(norm(toks[i]));
+    return{ready:()=>marked.size>0,eval:()=>{const need=toks.map((_,i)=>i).filter(isC);return need.length===marked.size&&need.every(i=>marked.has(i))},reveal(){locked=true;$$('.tok',area).forEach((b,i)=>{b.disabled=true;b.classList.remove('m');if(marked.has(i))b.classList.add(isC(i)?'ok':'bad');else if(isC(i))b.classList.add('miss')})}};
+  }
+};
+function simQ(){
+  const q=SIMQ[SIM.i],root=$('#simBody'),total=SIMQ.length;
+  root.innerHTML=`
+  <div class="glass pad">
+   <div class="row" style="justify-content:space-between"><span class="badge">Soal ${SIM.i+1} / ${total}</span><span class="badge y">${q.label}</span></div>
+   <div class="bar"><i style="width:${(SIM.i/total)*100}%"></i></div>
+   ${q.type==='pg'?`<div class="qtext">${esc(q.q)}</div>`:''}
+   <div id="qArea"></div><div id="fb"></div>
+   <div class="row c mt2"><button id="chk" class="btn cy">✔ Periksa Jawaban</button><button id="nx" class="btn gr" style="display:none">${SIM.i===total-1?'🏁 Lihat Hasil':'Lanjut ▶'}</button></div>
+  </div>`;
+  const B=BUILD[q.type](q,$('#qArea'));let locked=false;
+  $('#chk').onclick=()=>{
+    if(locked)return;
+    if(!B.ready()){toast('Jawab dulu ya 🙂');return}
+    locked=true;const ok=!!B.eval();B.reveal(ok);
+    SIM.res[SIM.i]=ok;Aud.sfx(ok?'good':'bad');
+    $('#fb').innerHTML=fbHTML(ok,q.exp);
+    $('#chk').style.display='none';$('#nx').style.display='';
+  };
+  $('#nx').onclick=()=>{SIM.i++;SIM.i<total?simQ():simResult()};
+}
+function predikat(s){return s>=85?'Sangat Baik':s>=70?'Baik':s>=55?'Cukup':'Terus Berlatih'}
+function simResult(){
+  const benar=SIM.res.filter(Boolean).length,score=benar*10,dur=Math.round((Date.now()-SIM.t0)/1000);
+  const rec={waktu:new Date().toISOString(),nama:S.name.trim(),kelas:S.kelas.trim(),nilai:score,benar,durasi:dur};
+  Aud.sfx('win');
+  $('#simBody').innerHTML=`
+  <div class="glass pad center-t">
+   <h2 class="h2 grad">🎉 Selamat, ${esc(S.name.trim())}!</h2>
+   <p class="muted">Kelas ${esc(S.kelas.trim())}</p>
+   <div class="score grad mt">${score}</div>
+   <p class="p">${benar} dari 10 soal benar · Predikat: <b>${predikat(score)}</b></p>
+   <div class="dots">${SIM.res.map((r,i)=>`<i class="${r?'ok':'bad'}">${i+1}</i>`).join('')}</div>
+   <p class="muted" id="sheetSt">⏳ Menyimpan nilai…</p>
+  </div>
+  <div class="glass pad mt2">
+   <h3 class="h3 center-t">🏅 Sertifikat Pencapaian</h3>
+   <div class="certwrap"><canvas id="cert"></canvas></div>
+   <div class="row c mt2"><button id="dlCert" class="btn am">⬇ Unduh Sertifikat (PNG)</button><button id="dlCsv" class="btn gh">📄 Unduh Rekap (CSV)</button><button id="again" class="btn cy">↻ Ulangi</button><button class="btn pk" data-go="kuis">🎮 Main Kuis</button><button class="btn gh" data-go="menu">☰ Menu</button></div>
+  </div>`;
+  const cv=$('#cert');drawCert(cv,S.name.trim(),score,S.kelas.trim());
+  $('#dlCert').onclick=()=>cv.toBlob(bl=>{const a=document.createElement('a');a.href=URL.createObjectURL(bl);a.download='Sertifikat_'+S.name.trim().replace(/\s+/g,'_')+'.png';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000)});
+  $('#dlCsv').onclick=downloadCsv;
+  $('#again').onclick=simIntro;
+  kirimNilai(rec).then(r=>{const el=$('#sheetSt');if(el)el.textContent=r.msg});
+}
+async function kirimNilai(rec){
+  try{const arr=JSON.parse(localStorage.getItem('mpi_rekap')||'[]');arr.push(rec);localStorage.setItem('mpi_rekap',JSON.stringify(arr))}catch(e){}
+  if(!SHEET_URL)return{ok:false,msg:'💾 Nilai tersimpan di perangkat ini (Sheet belum disambungkan oleh guru).'};
+  try{
+    await fetch(SHEET_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(rec)});
+    return{ok:true,msg:'✅ Nilai berhasil dikirim ke Sheet.'};
+  }catch(e){return{ok:false,msg:'⚠️ Gagal mengirim ke Sheet (periksa internet). Nilai tetap tersimpan di perangkat.'}}
+}
+function downloadCsv(){
+  let arr=[];try{arr=JSON.parse(localStorage.getItem('mpi_rekap')||'[]')}catch(e){}
+  const q=v=>'"'+String(v||'').replace(/"/g,'""')+'"';
+  const csv='Waktu,Nama,Kelas,Nilai,Benar,Durasi(detik)\n'+arr.map(r=>[r.waktu,q(r.nama),q(r.kelas),r.nilai,r.benar,r.durasi].join(',')).join('\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv'}));a.download='rekap_nilai_mpi.csv';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+}
+function drawCert(cv,name,score,kelas){
+  const W=1200,H=850;cv.width=W;cv.height=H;const c=cv.getContext('2d');
+  let g=c.createLinearGradient(0,0,W,H);g.addColorStop(0,'#0b1038');g.addColorStop(.6,'#1b1460');g.addColorStop(1,'#050816');c.fillStyle=g;c.fillRect(0,0,W,H);
+  for(let i=0;i<140;i++){c.globalAlpha=Math.random()*.8+.2;c.fillStyle='#fff';c.beginPath();c.arc(Math.random()*W,Math.random()*H,Math.random()*1.6+.3,0,6.283);c.fill()}
+  c.globalAlpha=1;
+  c.strokeStyle='#fbbf24';c.lineWidth=10;c.strokeRect(28,28,W-56,H-56);
+  c.strokeStyle='rgba(165,243,252,.7)';c.lineWidth=3;c.strokeRect(48,48,W-96,H-96);
+  c.strokeStyle='rgba(34,211,238,.25)';c.lineWidth=2;
+  for(let r=60;r<=260;r+=40){c.beginPath();c.ellipse(W/2,H/2+60,r*2.2,r*.8,0,0,6.283);c.stroke()}
+  // jam
+  c.save();c.translate(W/2,150);c.fillStyle='#0f172a';c.strokeStyle='#22d3ee';c.lineWidth=7;c.beginPath();c.arc(0,0,52,0,6.283);c.fill();c.stroke();
+  c.strokeStyle='#fbbf24';c.lineCap='round';c.lineWidth=6;c.beginPath();c.moveTo(0,0);c.lineTo(0,-30);c.stroke();c.strokeStyle='#fff';c.lineWidth=5;c.beginPath();c.moveTo(0,0);c.lineTo(22,14);c.stroke();c.restore();
+  c.textAlign='center';c.fillStyle='#fde68a';c.font='bold 62px Georgia,serif';c.fillText('SERTIFIKAT PENCAPAIAN',W/2,290);
+  c.fillStyle='#cfe0ff';c.font='28px Georgia,serif';c.fillText('Diberikan kepada',W/2,350);
+  let fs=84;c.font='italic bold '+fs+'px Georgia,serif';while(c.measureText(name).width>W-300&&fs>30){fs-=4;c.font='italic bold '+fs+'px Georgia,serif'}
+  const gr=c.createLinearGradient(W/2-300,0,W/2+300,0);gr.addColorStop(0,'#22d3ee');gr.addColorStop(.5,'#fff');gr.addColorStop(1,'#f472b6');c.fillStyle=gr;c.fillText(name,W/2,455);
+  c.strokeStyle='#fbbf24';c.lineWidth=3;c.beginPath();c.moveTo(W/2-300,480);c.lineTo(W/2+300,480);c.stroke();
+  c.fillStyle='#fde68a';c.font='bold 30px Georgia,serif';c.fillText('Kelas '+kelas,W/2,520);
+  c.fillStyle='#e8eefc';c.font='28px Georgia,serif';
+  c.fillText('atas keberhasilan menyelesaikan Simulasi Uji Pemahaman',W/2,545);
+  c.font='bold 34px Georgia,serif';c.fillStyle='#a5f3fc';c.fillText('Relativitas: Dilatasi Waktu · Fisika Kelas XII SMA',W/2,600);
+  c.fillStyle='#fff';c.font='bold 40px Georgia,serif';c.fillText('Nilai '+score+' / 100  ·  Predikat: '+predikat(score),W/2,675);
+  c.font='22px Georgia,serif';c.fillStyle='#cfe0ff';c.fillText(new Date().toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'}),W/2,725);
+  c.font='20px Georgia,serif';c.fillStyle='#9fb2e8';c.fillText('Media Pembelajaran Interaktif · '+DEV+' · November 2026',W/2,780);
+}
+
+/* =====================================================================
+   KUIS: 4 GAME BERLEVEL
+   ===================================================================== */
+const GAMES={
+ g1:{name:'Kuis Galaksi',icon:'🚀',desc:'Pilihan ganda bertingkat: konsep sampai penerapan',levels:4,cls:'g-cyan'},
+ g2:{name:'Kartu Memori',icon:'🧠',desc:'Cocokkan istilah dengan maknanya',levels:4,cls:'g-amber'},
+ g3:{name:'Hitung Gamma',icon:'🧮',desc:'Isi hasil hitungan γ dan Δt',levels:4,cls:'g-pink'},
+ g4:{name:'Susun Kata',icon:'🔤',desc:'Susun huruf menjadi istilah fisika',levels:5,cls:'g-green'}
+};
+const P=g=>S.prog[g]||(S.prog[g]={max:1,stars:{}});
+const kb=()=>$('#kuisBody');
+hooks.kuis=()=>showHub();
+kb().addEventListener('click',e=>{
+  const g=e.target.closest('[data-g]');if(g)return showLevels(g.dataset.g);
+  const l=e.target.closest('[data-lv]');if(l)return startLevel(l.dataset.game,+l.dataset.lv);
+  const b=e.target.closest('[data-kb]');if(b){if(b.dataset.kb==='hub')showHub();else showLevels(b.dataset.kb)}
+});
+function showHub(){
+  kb().innerHTML=`
+  <div class="glass pad center-t"><h2 class="h2 grad">🎮 Kuis &amp; Game Relativitas</h2><p class="p mt">Pilih satu dari 4 game. Selesaikan level untuk membuka level berikutnya dan kumpulkan bintang ⭐</p></div>
+  <div class="grid2">${Object.entries(GAMES).map(([k,g])=>{const p=P(k);const st=Object.values(p.stars).reduce((a,b)=>a+b,0);return`<button class="gcard ${g.cls}" data-g="${k}"><span class="ic">${g.icon}</span><span><b>${g.name}</b><span>${g.desc}</span><br><span>Level ${g.levels} · ⭐ ${st}</span></span></button>`}).join('')}</div>`;
+}
+function showLevels(g){
+  const G=GAMES[g],p=P(g);let html=`<div class="row"><button class="btn gh" data-kb="hub">◀ Pilih Game</button></div>
+  <div class="glass pad mt center-t"><div style="font-size:3rem">${G.icon}</div><h2 class="h2 grad">${G.name}</h2><p class="p">${G.desc}. Lulus level jika cukup baik untuk membuka level berikutnya.</p></div><div class="lvgrid">`;
+  for(let l=1;l<=G.levels;l++){const locked=l>p.max,s=p.stars[l]||0;html+=`<button class="lv" data-game="${g}" data-lv="${l}" ${locked?'disabled':''}>${locked?'🔒':'Level '+l}<small>${locked?'Terkunci':(s?'⭐'.repeat(s):'Belum dimainkan')}</small></button>`}
+  kb().innerHTML=html+'</div>';
+}
+function lvHead(g,l,i,n,extra=''){return`<div class="row" style="justify-content:space-between"><button class="btn gh" data-kb="${g}">◀ Level</button><span class="badge">${GAMES[g].name} · Level ${l}</span><span class="badge y">${extra||('Soal '+(i+1)+'/'+n)}</span></div><div class="bar"><i style="width:${(i/n)*100}%"></i></div>`}
+function startLevel(g,l){({g1:playG1,g2:playG2,g3:playG3,g4:playG4})[g](l)}
+function endLevel(g,l,score,total,stars,pass){
+  const p=P(g);
+  if(pass){p.max=Math.max(p.max,Math.min(l+1,GAMES[g].levels));p.stars[l]=Math.max(p.stars[l]||0,stars)}
+  save();Aud.sfx(pass?'win':'bad');
+  const last=l>=GAMES[g].levels;
+  kb().innerHTML=`<div class="glass pad center-t">
+   <div style="font-size:3rem">${pass?'🎉':'💪'}</div>
+   <h2 class="h2 grad">${pass?(last?'Semua level selesai!':'Level '+l+' selesai!'):'Hampir berhasil!'}</h2>
+   <div class="stars mt">${'⭐'.repeat(stars)}${'☆'.repeat(3-stars)}</div>
+   <p class="p mt">Skor: <b>${score}</b> dari ${total}</p>
+   <div class="row c mt2"><button class="btn cy" data-game="${g}" data-lv="${l}">↻ Ulangi</button>${pass&&!last?`<button class="btn gr" data-game="${g}" data-lv="${l+1}">Level ${l+1} ▶</button>`:''}<button class="btn gh" data-kb="${g}">☰ Pilih Level</button></div></div>`;
+}
+/* --- Game 1: Kuis Galaksi --- */
+const G1=[
+ [{q:'Teori yang menjelaskan dilatasi waktu dikemukakan oleh …',o:['Isaac Newton','Albert Einstein','Galileo Galilei','Nikola Tesla'],a:1,e:'Dilatasi waktu adalah konsekuensi teori relativitas khusus Einstein (1905).'},
+  {q:'Besaran yang sama bagi semua pengamat inersia menurut Einstein adalah …',o:['kecepatan mobil','kelajuan cahaya dalam vakum','massa benda','selang waktu'],a:1,e:'Postulat II: kelajuan cahaya c tetap bagi semua pengamat inersia.'},
+  {q:'Dilatasi waktu berarti …',o:['waktu berhenti di Bumi','jam yang bergerak berjalan lebih lambat menurut pengamat diam','jam berjalan lebih cepat saat dipanaskan','semua jam selalu sinkron'],a:1,e:'Selang waktu jam yang bergerak tampak lebih panjang (jam berjalan lebih lambat).'}],
+ [{q:'Nilai γ untuk benda yang diam adalah …',o:['0','1','2','tak hingga'],a:1,e:'v = 0 sehingga γ = 1/√1 = 1.'},
+  {q:'Jika kecepatan benda makin mendekati c, nilai γ akan …',o:['makin kecil','tetap 1','makin besar','menjadi nol'],a:2,e:'Penyebut √(1 − v²/c²) mengecil sehingga γ membesar.'},
+  {q:'Waktu proper (Δt₀) diukur oleh pengamat yang …',o:['bergerak cepat terhadap jam','diam terhadap jam','paling jauh dari jam','berada di Bulan'],a:1,e:'Waktu proper diukur pengamat yang diam terhadap jam dan bernilai paling kecil.'}],
+ [{q:'Pesawat melaju 0,6c. Nilai γ adalah …',o:['0,8','1,25','1,67','2,00'],a:1,e:'γ = 1/√(1 − 0,36) = 1/0,8 = 1,25.'},
+  {q:'Jika Δt₀ = 8 s dan γ = 1,25, maka Δt = …',o:['6,4 s','8 s','10 s','12 s'],a:2,e:'Δt = γΔt₀ = 1,25 × 8 = 10 s.'},
+  {q:'Rumus dilatasi waktu yang benar adalah …',o:['Δt = Δt₀ √(1 − v²/c²)','Δt = Δt₀ / √(1 − v²/c²)','Δt = Δt₀ (1 − v/c)','Δt = Δt₀ − v/c'],a:1,e:'Δt = Δt₀/√(1 − v²/c²) = γΔt₀.'}],
+ [{q:'Mengapa jam satelit GPS perlu dikoreksi?',o:['Baterai satelit cepat habis','Efek relativitas (kecepatan dan gravitasi) membuat jam satelit berbeda laju dengan jam di Bumi','Cuaca mengganggu sinyal','Satelit bergerak lebih cepat dari cahaya'],a:1,e:'Selisih bersih ±38 µs/hari dapat menimbulkan kesalahan posisi ±10 km per hari jika tidak dikoreksi.'},
+  {q:'Muon berumur 2,2 µs namun mencapai permukaan Bumi karena …',o:['muon lebih cepat dari cahaya','umur muon menurut pengamat di Bumi diperpanjang oleh dilatasi waktu','muon tidak meluruh','atmosfer menyimpan muon'],a:1,e:'Muon bergerak mendekati c sehingga γ besar dan umurnya menurut Bumi lebih panjang.'},
+  {q:'Pada v = 0,8c, astronaut mengalami 3 tahun perjalanan. Di Bumi berlalu …',o:['3 tahun','4 tahun','5 tahun','6 tahun'],a:2,e:'γ = 5/3 sehingga Δt = (5/3)(3) = 5 tahun.'}]
+];
+function playG1(l){
+  const qs=G1[l-1];let i=0,score=0;
+  function show(){
+    const q=qs[i],opts=shuffle(q.o.map((t,k)=>({t,ok:k===q.a})));
+    kb().innerHTML=`<div class="glass pad">${lvHead('g1',l,i,qs.length)}<div class="qtext">${esc(q.q)}</div><div class="opts">${opts.map((o,k)=>`<button class="opt" data-k="${k}">${String.fromCharCode(65+k)}. ${esc(o.t)}</button>`).join('')}</div><div id="fb"></div><div class="row c mt2"><button id="nx" class="btn gr" style="display:none">${i===qs.length-1?'🏁 Selesai':'Lanjut ▶'}</button></div></div>`;
+    let done=false;
+    $$('.opt',kb()).forEach(b=>b.onclick=()=>{
+      if(done)return;done=true;const k=+b.dataset.k,ok=opts[k].ok;if(ok)score++;
+      $$('.opt',kb()).forEach((x,j)=>{x.disabled=true;if(opts[j].ok)x.classList.add('ok');else if(j===k)x.classList.add('bad')});
+      Aud.sfx(ok?'good':'bad');$('#fb').innerHTML=fbHTML(ok,q.e);$('#nx').style.display='';
+    });
+    $('#nx').onclick=()=>{i++;i<qs.length?show():endLevel('g1',l,score,qs.length,score===qs.length?3:score>=2?2:1,score>=2)};
+  }
+  show();
+}
+/* --- Game 2: Kartu Memori --- */
+const PAIRS=[['Δt₀','Waktu proper'],['γ','Faktor Lorentz'],['c','3 × 10⁸ m/s'],['Δt','Waktu dilatasi'],['GPS','Jam satelit dikoreksi'],['Muon','Umur diperpanjang'],['v = 0,6c','γ = 1,25'],['v = 0,8c','γ ≈ 1,67']];
+function playG2(l){
+  const n=[3,4,6,8][l-1],pairs=shuffle(PAIRS).slice(0,n);
+  const cards=shuffle(pairs.flatMap((p,i)=>[{pid:i,t:p[0]},{pid:i,t:p[1]}]));
+  let first=null,lock=false,moves=0,found=0;
+  kb().innerHTML=`<div class="glass pad">${lvHead('g2',l,0,1,'Langkah: <span id="mv">0</span>')}<p class="muted">Balik dua kartu untuk mencocokkan istilah dengan pasangan maknanya.</p><div class="memgrid">${cards.map((c,i)=>`<button class="fc" data-i="${i}"><span class="q">❓</span></button>`).join('')}</div></div>`;
+  const btns=$$('.fc',kb());
+  btns.forEach((b,i)=>b.onclick=()=>{
+    if(lock||b.classList.contains('up')||b.classList.contains('done'))return;
+    Aud.sfx('flip');b.classList.add('up');b.innerHTML=esc(cards[i].t);
+    if(first===null){first=i;return}
+    moves++;$('#mv').textContent=moves;
+    const a=first;first=null;
+    if(cards[a].pid===cards[i].pid){
+      Aud.sfx('match');[a,i].forEach(k=>{btns[k].classList.remove('up');btns[k].classList.add('done');btns[k].disabled=true});found++;
+      if(found===n)setTimeout(()=>endLevel('g2',l,moves+' langkah',n+' pasang',moves<=n+2?3:moves<=n*2?2:1,true),700);
+    }else{
+      lock=true;setTimeout(()=>{[a,i].forEach(k=>{btns[k].classList.remove('up');btns[k].innerHTML='<span class="q">❓</span>'});lock=false},850);
+    }
+  });
+}
+/* --- Game 3: Hitung Gamma --- */
+const G3=[
+ [{q:'Benda diam (v = 0). Berapa nilai γ?',chk:x=>Math.abs(x-1)<.01,e:'γ = 1/√(1 − 0) = <b>1</b>.'},
+  {q:'Pesawat bergerak 0,6c. Hitung γ.',chk:x=>Math.abs(x-1.25)<.011,e:'γ = 1/√(1 − 0,36) = 1/0,8 = <b>1,25</b>.'},
+  {q:'Jam bergerak memiliki waktu proper 4 s dan γ = 2. Berapa selang waktu menurut pengamat diam (s)?',chk:x=>Math.abs(x-8)<.06,e:'Δt = γΔt₀ = 2 × 4 = <b>8 s</b>.'}],
+ [{q:'Pada v = 0,8c, hitung γ (dua desimal).',chk:x=>Math.abs(x-5/3)<.011,e:'γ = 1/√(1 − 0,64) = 1/0,6 ≈ <b>1,67</b>.'},
+  {q:'Δt₀ = 6 jam dan v = 0,8c. Hitung Δt (jam).',chk:x=>Math.abs(x-10)<.06,e:'Δt = (5/3)(6) = <b>10 jam</b>.'},
+  {q:'Pada v = 0,866c (≈ √3/2 c), berapa γ (bulatkan satu desimal)?',chk:x=>Math.abs(x-2)<.06,e:'1 − 0,75 = 0,25, √0,25 = 0,5, sehingga γ = <b>2</b>.'}],
+ [{q:'Δt₀ = 10 tahun, v = 0,6c. Berapa Δt (tahun)?',chk:x=>Math.abs(x-12.5)<.06,e:'Δt = 1,25 × 10 = <b>12,5 tahun</b>.'},
+  {q:'Pengamat di Bumi mencatat Δt = 20 s untuk jam yang bergerak dengan γ = 1,25. Berapa waktu proper Δt₀ (s)?',chk:x=>Math.abs(x-16)<.1,e:'Δt₀ = Δt/γ = 20/1,25 = <b>16 s</b>.'},
+  {q:'Muon dengan Δt₀ = 3 µs bergerak 0,99c (γ ≈ 7,09). Hitung Δt (µs).',chk:x=>Math.abs(x-21.27)<.35,e:'Δt = 7,09 × 3 ≈ <b>21,3 µs</b>.'}],
+ [{q:'Umur proper muon 2,2 µs, γ ≈ 15,8. Berapa umurnya menurut pengamat di Bumi (µs)?',chk:x=>Math.abs(x-34.76)<.5,e:'Δt = 15,8 × 2,2 ≈ <b>34,8 µs</b>.'},
+  {q:'Astronaut mengalami 5 tahun di pesawat 0,8c. Berapa tahun berlalu di Bumi? (dua desimal)',chk:x=>Math.abs(x-8.33)<.06,e:'Δt = (5/3)(5) ≈ <b>8,33 tahun</b>.'},
+  {q:'Δt = 25 tahun dan Δt₀ = 15 tahun. Berapakah v/c? (desimal, mis. 0,5)',chk:x=>Math.abs(x-.8)<.011||Math.abs(x-80)<1.1,e:'γ = 25/15 = 5/3 → β² = 1 − 9/25 = 0,64 → <b>v = 0,8c</b>.'}]
+];
+function playG3(l){
+  const qs=G3[l-1];let i=0,score=0;
+  function show(){
+    const q=qs[i];
+    kb().innerHTML=`<div class="glass pad">${lvHead('g3',l,i,qs.length)}<div class="box"><b>Ingat:</b> γ = 1/√(1 − v²/c²) &nbsp;|&nbsp; Δt = γΔt₀</div><div class="qtext mt">${esc(q.q)}</div><input id="ansIn" class="inp" type="text" inputmode="text" autocomplete="off" spellcheck="false" placeholder="Ketik angka jawabanmu…"><div id="fb"></div><div class="row c mt2"><button id="chk" class="btn cy">✔ Periksa</button><button id="nx" class="btn gr" style="display:none">${i===qs.length-1?'🏁 Selesai':'Lanjut ▶'}</button></div></div>`;
+    const inp=$('#ansIn');setTimeout(()=>inp.focus(),50);let done=false;
+    const check=()=>{
+      if(done)return;if(inp.value.trim()===''){toast('Isi jawabanmu dulu ya 🙂');return}
+      done=true;const x=parseNum(inp.value),ok=!isNaN(x)&&q.chk(x);if(ok)score++;
+      inp.readOnly=true;inp.style.borderColor=ok?'#34d399':'#fb7185';
+      Aud.sfx(ok?'good':'bad');$('#fb').innerHTML=fbHTML(ok,q.e);$('#chk').style.display='none';$('#nx').style.display='';
+    };
+    $('#chk').onclick=check;
+    inp.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();done?$('#nx').click():check()}});
+    $('#nx').onclick=()=>{i++;i<qs.length?show():endLevel('g3',l,score,qs.length,score===qs.length?3:score>=2?2:1,score>=2)};
+  }
+  show();
+}
+/* --- Game 4: Susun Kata --- */
+const G4=[
+ [['WAKTU','Besaran yang berjalan lebih lambat pada jam yang bergerak sangat cepat'],['GERAK','Syarat terjadinya dilatasi waktu: ada ... relatif antara pengamat dan jam'],['JAM','Alat ukur waktu; jam atom dipasang pada satelit GPS']],
+ [['CAHAYA','Kelajuannya (c) sama bagi semua pengamat inersia'],['GAMMA','Nama huruf Yunani (γ) untuk faktor Lorentz'],['MUON','Partikel sinar kosmik berumur ±2,2 mikrodetik saat diam']],
+ [['EINSTEIN','Fisikawan pencetus teori relativitas khusus'],['LORENTZ','Fisikawan Belanda yang namanya dipakai untuk faktor γ'],['SATELIT','Benda angkasa yang membawa jam atom GPS']],
+ [['DILATASI','Pemuaian/pemanjangan selang waktu disebut ... waktu'],['PENGAMAT','Orang atau alat yang mengukur peristiwa dari suatu kerangka acuan'],['KECEPATAN','Besaran v dalam rumus faktor Lorentz']],
+ [['RELATIVITAS','Nama teori Einstein tentang ruang dan waktu'],['AKSELERATOR','Mesin pemercepat partikel, misalnya LHC'],['TRANSFORMASI','Lorentz ... koordinat: perubahan ruang-waktu antar kerangka acuan']]
+];
+function scramble(w){let s;do{s=shuffle([...w]).join('')}while(s===w&&w.length>1);return s}
+function playG4(l){
+  const ws=G4[l-1];let i=0,first=0,solved=0;
+  function show(){
+    const [word,hint]=ws[i],letters=[...scramble(word)];let ans=[],used=Array(letters.length).fill(false),tries=0,fin=false;
+    kb().innerHTML=`<div class="glass pad">${lvHead('g4',l,i,ws.length,'Kata '+(i+1)+'/'+ws.length)}<div class="qtext center-t">💡 ${esc(hint)}</div><div class="slots" id="slots"></div><div class="slots" id="tiles"></div><div class="row c mt"><button id="bk" class="btn gh">⌫ Hapus</button><button id="rs" class="btn gh">↺ Ulang</button><button id="sk" class="btn gh">⏭ Lewati</button></div><div id="fb"></div><div class="row c mt2"><button id="nx" class="btn gr" style="display:none">${i===ws.length-1?'🏁 Selesai':'Lanjut ▶'}</button></div></div>`;
+    const slots=$('#slots'),tiles=$('#tiles');
+    function draw(){
+      slots.innerHTML=[...word].map((_,k)=>`<div class="slot ${ans[k]?'f':''}">${ans[k]?ans[k].ch:''}</div>`).join('');
+      tiles.innerHTML=letters.map((ch,k)=>`<button class="tile" data-k="${k}" ${used[k]||fin?'disabled':''}>${ch}</button>`).join('');
+    }
+    function finish(ok,msg){
+      fin=true;draw();$('#bk').disabled=$('#rs').disabled=$('#sk').disabled=true;
+      if(ok){slots.classList.add('ok');Aud.sfx('good');solved++;if(tries===0)first++}
+      $('#fb').innerHTML=fbHTML(ok,msg);$('#nx').style.display='';
+    }
+    tiles.addEventListener('click',e=>{
+      const b=e.target.closest('.tile');if(!b||fin)return;const k=+b.dataset.k;if(used[k])return;
+      used[k]=true;ans.push({ch:letters[k],k});draw();
+      if(ans.length===word.length){
+        if(ans.map(a=>a.ch).join('')===word)finish(true,`Kata yang tepat: <b>${word}</b>.`);
+        else{tries++;Aud.sfx('bad');slots.classList.remove('bad');void slots.offsetWidth;slots.classList.add('bad');setTimeout(()=>{ans=[];used=used.map(()=>false);slots.classList.remove('bad');draw()},550);toast('Belum tepat, coba lagi! 💪')}
+      }
+    });
+    $('#bk').onclick=()=>{if(fin||!ans.length)return;const a=ans.pop();used[a.k]=false;draw()};
+    $('#rs').onclick=()=>{if(fin)return;ans=[];used=used.map(()=>false);draw()};
+    $('#sk').onclick=()=>{if(fin)return;tries++;ans=[...word].map(ch=>({ch}));finish(false,`Jawaban: <b>${word}</b>.`)};
+    $('#nx').onclick=()=>{i++;i<ws.length?show():endLevel('g4',l,first+' benar langsung',ws.length+' kata',first===ws.length?3:solved>=2?2:1,solved>=2)};
+    draw();
+  }
+  show();
+}
+/* ---------- Mulai ---------- */
+go('splash');
+</script>
+</body>
+</html>
